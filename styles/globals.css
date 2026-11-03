@@ -1,0 +1,153 @@
+html,
+body {
+  min-height: 100%;
+}
+
+#__next {
+  height: 100%;
+}
+
+code {
+  font-family: 'Inter', sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue';
+  padding: 0.1rem 0.4rem;
+  font-size: 90%;
+  color: #d400ff;
+  border-radius: 0.1335rem;
+}
+
+code:not([class*='language-']):before,
+code:not([class*='language-']):after {
+  content: '`';
+}
+
+code[class*='language-'] {
+  padding: 0;
+}
+
+.MuiBox-root > div.react-hot-toast-container {
+  z-index: 9999 !important;
+  /* High zIndex for visibility */
+}
+
+.MuiGrid-container {
+  width: 100% !important;
+}
+
+/* Adjust for tablet screens */
+@media (max-width: 768px) {
+  .MuiBox-root > div.react-hot-toast-container {
+    z-index: 1500 !important;
+    /* Adjusted for tablet screens */
+  }
+}
+
+/* cmdk command palette (Dashboard search).
+   Frosted backdrop covers the WHOLE app (incl. sidenav) — overlay needs a z-index
+   ABOVE the MUI drawer/appbar. Palette is clean solid WHITE; selection = neutral
+   filled row (no accent strip); hover = same fill. Seamless scale+fade in. */
+[cmdk-overlay] {
+  position: fixed;
+  inset: 0;
+  z-index: 2000; /* above MUI Drawer (1200) + appBar + any nav stacking context */
+  background: rgba(28, 26, 22, 0.38);
+  backdrop-filter: blur(6px) saturate(115%);
+  -webkit-backdrop-filter: blur(6px) saturate(115%);
+  animation: ax-pal-overlay-in 0.16s ease forwards;
+}
+[cmdk-dialog] {
+  position: fixed;
+  inset: 0;
+  z-index: 2001; /* the content sits above its own overlay */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+[cmdk-root] {
+  width: 680px;
+  max-width: 94vw;
+  margin-top: 12vh;
+  background: #ffffff; /* clean solid white */
+  border: 1px solid #ececec;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22), 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transform-origin: top center;
+  /* Expand-from-bar morph: starts at the hero bar's offset + scale (CSS vars set by
+     SearchPalette), then settles into place. Falls back to a plain scale-in. */
+  animation: ax-pal-morph 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+[cmdk-group-heading] {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #9aa09b;
+  font-weight: 600;
+  padding: 12px 14px 6px;
+}
+[cmdk-item] {
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #2c302e;
+  transition: background-color 0.1s ease;
+}
+/* hover AND keyboard selection share ONE fill — neutral, no green strip */
+[cmdk-item]:hover,
+[cmdk-item][data-selected='true'] {
+  background: #f1efea;
+}
+[cmdk-item][data-selected='true'] {
+  background: #ebe8e2;
+}
+[cmdk-list] {
+  transition: height 0.12s ease;
+}
+
+@keyframes ax-pal-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes ax-pal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes ax-pal-actions-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+/* morph: begin translated to the hero-bar centre + scaled to its width, end at rest */
+@keyframes ax-pal-morph {
+  from {
+    opacity: 0.4;
+    transform: translate(var(--ax-pal-dx, 0px), var(--ax-pal-dy, -8px)) scale(var(--ax-pal-sx, 0.97));
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [cmdk-overlay],
+  [cmdk-root],
+  [cmdk-list] {
+    animation: none !important;
+    transition: none;
+  }
+}

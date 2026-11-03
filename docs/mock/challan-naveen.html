@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Challan · Naveen's goods-receipt sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#1F415B;--text:#44544A;--quiet:#7A8684;--line:#C3CEC7;--hair:rgba(0,0,0,.08);--mint:#E8F4F2;--head:#C1D3D0;--green:#37BD69;--gdark:#006D35;--tert:#FA6140;--n05:rgba(0,0,0,.05);--panel:#F3F7F5}
+  *{box-sizing:border-box}body{margin:0;background:#5f8a8a;font-family:Inter,system-ui,sans-serif;color:var(--ink);font-size:14px;-webkit-font-smoothing:antialiased}
+  .dim{min-height:100vh;padding:28px;background:linear-gradient(rgba(31,65,91,.55),rgba(31,65,91,.55))}
+  .sheet{max-width:1960px;margin:0 auto;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden;display:grid;grid-template-rows:auto 1fr;min-height:1240px}
+  .hdr{display:flex;align-items:center;gap:14px;padding:18px 24px;border-bottom:1px solid var(--hair)}
+  .tile{width:48px;height:48px;border-radius:10px;display:grid;place-items:center;background:var(--mint);color:var(--gdark)}
+  .tile.n{width:52px;height:52px;background:var(--n05);color:var(--text);flex-shrink:0}
+  .ttl{font-size:26px;font-weight:500;color:var(--text)}.chip{background:var(--n05);color:var(--ink);font-size:18px;font-weight:500;padding:6px 12px;border-radius:8px}
+  .pill{display:inline-flex;align-items:center;height:26px;padding:0 12px;border-radius:13px;font-size:13px;font-weight:600;white-space:nowrap}
+  .pill.ok{background:var(--mint);color:var(--gdark)}.pill.warn{background:rgba(250,97,64,.12);color:var(--tert)}
+  .grow{flex:1}.btn{display:inline-flex;align-items:center;gap:10px;height:46px;padding:0 20px;border-radius:8px;font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:.3px}
+  .btn.soft{background:var(--mint);color:var(--gdark)}.btn.pri{background:var(--green);color:#fff}
+  .x{width:40px;height:40px;display:grid;place-items:center;color:var(--quiet)}
+  .body{display:grid;grid-template-columns:minmax(0,1fr) 420px}
+  .main{padding:24px 28px}.panel{background:var(--panel);padding:24px 24px 24px 28px;display:flex;flex-direction:column;gap:20px}
+  .th{display:flex;align-items:center;gap:10px;margin:0 0 18px}.th b{font-size:20px;font-weight:500;color:var(--text);flex:1}
+  table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  th{background:var(--head);color:var(--text);font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:.17px;text-align:left;padding:0 16px;height:66px;white-space:nowrap}
+  th+th,td+td{border-left:0}th{position:relative}th+th:before{content:"";position:absolute;left:0;top:22px;bottom:22px;width:1px;background:rgba(0,0,0,.12)}
+  th.r,td.r{text-align:right}td{padding:16px;height:78px;border-top:1px solid var(--hair);color:var(--ink);vertical-align:middle;font-size:16px}
+  td .pr{display:flex;align-items:flex-start;gap:10px}td .chev{color:var(--text);margin-top:3px}td .nm{font-weight:600;color:#000;display:block;font-size:16px}td .cd{font-size:13px;color:var(--quiet)}
+  td .rej{color:var(--tert)}td .z{color:var(--quiet)}
+  .card{background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:8px 20px 6px}
+  .card h4{margin:12px 0 2px;font-size:20px;font-weight:500;color:var(--text);display:flex;align-items:center;justify-content:space-between}
+  .row{display:flex;align-items:center;gap:16px;padding:16px 0}.row+.row{border-top:1px solid var(--hair)}
+  .row .lab{font-size:14px;color:var(--quiet);margin-bottom:2px}.row .val{font-size:18px;color:var(--ink)}.row .sub{font-size:14px;color:var(--quiet);margin-top:2px}
+  .thumb{width:52px;height:52px;border-radius:8px;border:1px solid var(--hair);background:#fff;display:grid;place-items:center;flex-shrink:0}
+  .plate{width:52px;height:52px;border-radius:8px;background:#2b2b2b;display:grid;place-items:center;flex-shrink:0}.plate span{background:#f5e6a3;color:#222;font-size:7px;font-weight:700;padding:1px 4px;border-radius:2px;letter-spacing:.3px}
+  .stamp{width:52px;height:52px;flex-shrink:0}
+  svg{display:block}
+  .note{max-width:1960px;margin:18px auto 0;color:#fff;font-size:13px;opacity:.85}
+</style></head><body><div class="dim">
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="truck" viewBox="0 0 24 24"><path fill="currentColor" d="M18 18.5a1.5 1.5 0 0 1-1.5-1.5a1.5 1.5 0 0 1 1.5-1.5a1.5 1.5 0 0 1 1.5 1.5a1.5 1.5 0 0 1-1.5 1.5m1.5-9H17V12h4.46zM6 18.5A1.5 1.5 0 0 1 4.5 17A1.5 1.5 0 0 1 6 15.5A1.5 1.5 0 0 1 7.5 17A1.5 1.5 0 0 1 6 18.5M20 8h-3V4H3c-1.11 0-2 .89-2 2v11h2a3 3 0 0 0 3 3a3 3 0 0 0 3-3h6a3 3 0 0 0 3 3a3 3 0 0 0 3-3h2v-5zM8.5 7.5L10 9l-4 4l-2.5-2.5L5 9l1 1z"/></symbol>
+<symbol id="store" viewBox="0 0 24 24"><path fill="currentColor" d="M2 7h20v2H2zm1 3h18v10H3zm2 2v6h6v-6zm2 2h2v2H7zM3 4h18v2H3z"/></symbol>
+<symbol id="cal" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V8h14zm-7-9a4 4 0 1 0 0 8a4 4 0 0 0 0-8m0 6.5a2.5 2.5 0 1 1 0-5a2.5 2.5 0 0 1 0 5m.5-4h-1v2.2l1.5 1l.5-.8l-1-.7z"/></symbol>
+<symbol id="wh" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3L2 8v13h20V8zm-6 16v-8h12v8h-2v-6h-3v6h-2v-6H8v6z"/></symbol>
+<symbol id="doc" viewBox="0 0 24 24"><path fill="currentColor" d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2m7 1.5V9h5.5zM8 12v2h8v-2zm0 4v2h5v-2z"/></symbol>
+<symbol id="sign" viewBox="0 0 24 24"><path fill="currentColor" d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2m7 1.5V9h5.5zM7 19l2.2-.6c.2 0 .4-.1.5-.3l5.6-5.6l-2.1-2.1l-5.6 5.6c-.2.2-.3.4-.3.6zm8-8.9l1.2-1.2c.4-.4 1-.4 1.4 0l.7.7c.4.4.4 1 0 1.4l-1.2 1.2z"/></symbol>
+<symbol id="user" viewBox="0 0 24 24"><path fill="currentColor" d="M12 4a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4m0 2a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2m0 7c2.67 0 8 1.33 8 4v3H4v-3c0-2.67 5.33-4 8-4m0 1.9c-2.97 0-6.1 1.46-6.1 2.1v1.1h12.2V17c0-.64-3.13-2.1-6.1-2.1"/></symbol>
+<symbol id="in" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5a2 2 0 0 0-2 2v4h2V5h14v14H5v-4H3v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m-8.9 12.5l1.4 1.4L16 12.5l-4.5-4.4l-1.4 1.4l2.1 2H3v2h9.2z"/></symbol>
+<symbol id="out" viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h14a2 2 0 0 1 2 2v4h-2V5H5v14h14v-4h2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2m8.1 12.5l-1.4 1.4L7.2 12.5l4.5-4.4l1.4 1.4l-2.1 2H21v2h-10z"/></symbol>
+<symbol id="hist" viewBox="0 0 24 24"><path fill="currentColor" d="M13.5 8H12v5l4.28 2.54l.72-1.21l-3.5-2.08zM13 3a9 9 0 0 0-9 9H1l3.96 4.03L9 12H6a7 7 0 0 1 7-7a7 7 0 0 1 7 7a7 7 0 0 1-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.9 8.9 0 0 0 13 21a9 9 0 0 0 9-9a9 9 0 0 0-9-9"/></symbol>
+<symbol id="box" viewBox="0 0 24 24"><path fill="currentColor" d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.99.99 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88zM12 4.15L6.04 7.5L12 10.85l5.96-3.35zM5 15.91l6 3.38v-6.71L5 9.21zm14 0v-6.7l-6 3.37v6.71z"/></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path fill="currentColor" d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6l-6-6z"/></symbol>
+<symbol id="close" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></symbol>
+<symbol id="stampsvg" viewBox="0 0 100 100"><g transform="rotate(-8 50 50)"><circle cx="50" cy="50" r="45" fill="none" stroke="#188554" stroke-width="4"/><circle cx="50" cy="50" r="37" fill="none" stroke="#188554" stroke-width="1.5"/><text x="50" y="34" text-anchor="middle" font-size="10" font-weight="700" fill="#188554">· SIGNED ·</text><text x="50" y="56" text-anchor="middle" font-size="15" font-weight="700" fill="#188554">Sealed</text><text x="50" y="74" text-anchor="middle" font-size="9" font-weight="700" fill="#188554">· DELIVERED ·</text></g></symbol>
+<symbol id="gatesheet" viewBox="0 0 40 40"><rect x="6" y="4" width="28" height="32" fill="#fff" stroke="#999"/><rect x="10" y="9" width="12" height="2" fill="#555"/><rect x="10" y="14" width="20" height="1.5" fill="#aaa"/><rect x="10" y="18" width="20" height="1.5" fill="#aaa"/><rect x="10" y="22" width="14" height="1.5" fill="#aaa"/><rect x="10" y="26" width="20" height="1.5" fill="#aaa"/><rect x="10" y="30" width="9" height="1.5" fill="#aaa"/></symbol>
+</defs></svg>
+
+<div class="sheet">
+  <div class="hdr">
+    <div class="tile"><svg width="26" height="26"><use href="#truck"/></svg></div>
+    <div class="ttl">Goods receipt</div><div class="chip">BVS-2113</div><span class="pill ok">To bill</span>
+    <div class="grow"></div>
+    <div class="btn soft"><svg width="20" height="20"><use href="#hist"/></svg> History</div>
+    <div class="btn pri">+ Add invoice</div>
+    <div class="x"><svg width="26" height="26"><use href="#close"/></svg></div>
+  </div>
+  <div class="body">
+    <div class="main">
+      <div class="th"><svg width="24" height="24" style="color:#44544A"><use href="#box"/></svg><b>Products · 3</b><span class="pill warn">1 line with rejected quantity</span></div>
+      <table>
+        <tr><th>Product</th><th>Batch</th><th>Expiry</th><th>Cont</th><th class="r">Challan qty</th><th class="r">Received qty</th><th class="r">Rejected qty</th><th>Reason</th></tr>
+        <tr><td><div class="pr"><svg class="chev" width="20" height="20"><use href="#chev"/></svg><div><span class="nm">Mealworms live</span><span class="cd">NV-0063</span></div></div></td><td>B26-4120</td><td class="z">—</td><td>1</td><td class="r">150 gm</td><td class="r"><b>150 gm</b></td><td class="r z">0 gm</td><td class="z">—</td></tr>
+        <tr><td><div class="pr"><svg class="chev" width="20" height="20"><use href="#chev"/></svg><div><span class="nm">Mazuri primate diet</span><span class="cd">FED-0018</span></div></div></td><td>B26-4121</td><td>12 Mar 27</td><td>6</td><td class="r">8 10 kg/bag</td><td class="r"><b>6 10 kg/bag</b></td><td class="r rej">2 10 kg/bag</td><td>Other</td></tr>
+        <tr><td><div class="pr"><svg class="chev" width="20" height="20"><use href="#chev"/></svg><div><span class="nm">Multivitamin powder</span><span class="cd">GRC-0048</span></div></div></td><td>B26-4122</td><td>30 Jun 27</td><td>1</td><td class="r">500 gm</td><td class="r"><b>500 gm</b></td><td class="r z">0 gm</td><td class="z">—</td></tr>
+      </table>
+    </div>
+    <div class="panel">
+      <div class="card"><h4>Delivery</h4>
+        <div class="row"><div class="tile n"><svg width="24" height="24"><use href="#store"/></svg></div><div><div class="lab">Vendor</div><div class="val">Bharat Vet Supplies</div><div class="sub">GSTIN 29AAJFB2286N1Z0</div></div></div>
+        <div class="row"><div class="tile n"><svg width="24" height="24"><use href="#cal"/></svg></div><div><div class="lab">Received</div><div class="val">05-Oct-26, 7:28 AM</div><div class="sub">by Pooja Desai</div></div></div>
+        <div class="row"><div class="tile n"><svg width="24" height="24"><use href="#wh"/></svg></div><div><div class="lab">Warehouse</div><div class="val">Central Store</div></div></div>
+      </div>
+      <div class="card"><h4>Attachments</h4>
+        <div class="row"><div class="tile n"><svg width="24" height="24"><use href="#doc"/></svg></div><div><div class="lab">Filed at receiving</div><div class="val">None</div></div></div>
+        <div class="row"><div class="tile n" style="color:#188554"><svg width="26" height="26"><use href="#sign"/></svg></div><div><div class="lab">Signed DC</div><div class="val">signed-dc.jpg</div><div class="sub">1.2 MB</div></div></div>
+        <div class="row"><div class="thumb"><svg width="40" height="40"><use href="#gatesheet"/></svg></div><div><div class="lab">From the gate (security)</div><div class="val">Sheet #1 · BVS-2113</div></div></div>
+      </div>
+      <div class="card"><h4>Vehicle</h4>
+        <div class="row"><div class="plate"><span>KA 05 PF 8183</span></div><div><div class="lab">Vehicle</div><div class="val">KA05PF8183 · GV-26-0368</div></div></div>
+        <div class="row"><div class="tile n"><svg width="24" height="24"><use href="#user"/></svg></div><div><div class="lab">Driver</div><div class="val">Manjunath · 93612 07079</div></div></div>
+        <div class="row"><div class="tile n"><svg width="24" height="24"><use href="#in"/></svg></div><div><div class="lab">Entered</div><div class="val">05-Oct-26, 7:05 AM</div><div class="sub">by Manoj Yadav</div></div></div>
+        <div class="row"><div class="tile n"><svg width="24" height="24"><use href="#out"/></svg></div><div><div class="lab">Exited</div><div class="val">05-Oct-26, 7:55 AM</div><div class="sub">by Manoj Yadav</div></div></div>
+      </div>
+      <div class="card"><h4>Bill Desk</h4>
+        <div class="row"><svg class="stamp"><use href="#stampsvg"/></svg><div><div class="lab">Now</div><div class="val">Not on an invoice yet</div><div class="sub">signed copy on file · free to bill</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="note">Naveen's goods-receipt sheet, one to one, with BVS-2113 in it. Edit is Add invoice here; the print buttons are gone. Batch, expiry, containers, the signed copy, the gate sheet and the vehicle visit are shown as his build holds them; our snapshot has to take those fields before the page can show real values.</p>
+</div></body></html>

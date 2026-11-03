@@ -1,0 +1,12 @@
+node_modules
+.next
+.vercel
+
+# build output and local-only files
+out/
+.wrangler/
+.vercel/
+.env*
+!.env.example
+.DS_Store
+*.tsbuildinfo

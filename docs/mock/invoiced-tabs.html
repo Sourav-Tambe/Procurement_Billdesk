@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invoiced sub-tabs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EFF5F2;--text:#44544A;--quiet:#7A8684;--line:#DAE7DF;--outline:#C3CEC7;--green:#37BD69;--gdark:#006D35;--tint:#E8F4F2;--ink:#1F415B;--navy:#1F415B;--tert:#FA6140;--tert20:#FFBDA833;--err:#E93353;--errbg:#FFD3D3;--notes:#FCF4AE;--amber:#B26A00;--sec:#dff9f7}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,sans-serif;color:var(--text);padding:32px}
+h1{font-size:24px;font-weight:600;margin:0 0 6px}.lead{margin:0 0 24px;color:var(--quiet);font-size:14px;max-width:960px}
+.opt{margin-bottom:36px}.opt>h2{font-size:18px;font-weight:600;margin:0 0 4px}.opt>p{font-size:14px;color:var(--quiet);margin:0 0 14px;max-width:960px}
+.rec{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:2px 10px;border-radius:10px;margin-left:8px;vertical-align:middle}
+.page{background:#fff;border-radius:12px;padding:28px 30px 24px;max-width:1500px}
+.ph{display:flex;align-items:center}.ph h3{font-size:24px;font-weight:500;margin:0;flex:1}.add{background:var(--green);color:#fff;height:40px;padding:0 18px;border-radius:8px;display:flex;align-items:center;gap:8px;font-size:16px;font-weight:500;text-transform:uppercase;letter-spacing:.4px}
+.l1{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:22px 0 22px}.l1 span{padding:12px 20px;font-size:16px;color:var(--quiet)}.l1 .on{color:var(--green);border-bottom:2px solid var(--green);font-weight:500}
+.l2{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}.l2 span{height:40px;padding:0 20px;border-radius:8px;display:flex;align-items:center;font-size:14px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;background:rgba(0,0,0,.05)}
+.l2 .on{background:var(--navy);color:#fff}.l2 .dot{width:8px;height:8px;border-radius:50%;background:var(--tert);margin-left:8px}
+.tb{display:flex;align-items:center;gap:12px;margin-bottom:18px}.s{width:343px;height:40px;border:1px solid var(--outline);border-radius:4px;display:flex;align-items:center;gap:10px;padding:0 12px;color:#9aa;font-size:14px}.sp{flex:1}.dd{height:40px;min-width:180px;border:1px solid var(--outline);border-radius:4px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:14px}.dd::after{content:'▾';color:var(--quiet)}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th{background:var(--tint);text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:0 14px;height:48px;color:var(--ink)}td{padding:12px 14px;border-top:1px solid var(--line);vertical-align:middle}
+.r{text-align:right}.b{font-weight:600;color:#000}.q{color:var(--quiet);font-size:12px}.pill{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:12px;font-size:12px;font-weight:600;white-space:nowrap}
+.p-grey{background:rgba(0,0,0,.05)}.p-ok{background:var(--tint);color:var(--gdark)}.p-chk{background:var(--notes);color:var(--amber)}.p-bad{background:var(--errbg);color:var(--err)}.p-warn{background:var(--tert20);color:var(--tert)}.p-info{background:var(--sec);color:var(--ink)}
+.btn{height:40px;padding:0 16px;border:1px solid var(--outline);border-radius:8px;display:inline-flex;align-items:center;gap:6px;color:var(--green);font-size:16px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.note{font-size:13px;color:var(--text);max-width:360px}.mis{color:var(--tert)}
+.who{display:flex;align-items:center;gap:10px}.av{width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.06);display:grid;place-items:center;font-size:12px;font-weight:600}
+.bar{display:flex;gap:2px}.bar i{display:block;width:22px;height:6px;border-radius:3px;background:var(--line)}.bar i.d{background:var(--green)}.bar i.c{background:var(--ink)}
+.tabs-only{display:flex;flex-direction:column;gap:14px}
+</style></head><body>
+<h1>Invoiced, in the agreed pipeline</h1>
+<p class="lead">Saving an invoice now sends it to the head, so Matched and With discrepancies stop being places where invoices wait. The clerk's two to-do lists come first; the rest is tracking. Sent invoices folds into In progress and Closed.</p>
+<div id="root"></div>
+<script>
+const robot='<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a2 2 0 0 1 1 3.7V7h4a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3h4V5.7A2 2 0 0 1 12 2zM9 12a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>'
+const head=(tabs,on,dd)=>`<div class="ph"><h3>Delivery challans</h3><span class="add">＋ Add invoice</span></div>
+<div class="l1"><span>To Bill (23)</span><span class="on">Invoiced (14)</span><span>All (65)</span></div>
+<div class="l2">${tabs.map(([l,dot])=>`<span class="${l===on?'on':''}">${l}${dot?'<i class="dot"></i>':''}</span>`).join('')}</div>
+<div class="tb"><span class="s">⌕ Search invoice, vendor or challan</span><span class="sp"></span>${dd.map(d=>`<span class="dd">${d}</span>`).join('')}<span class="dd" style="min-width:260px">All time - Upto 02 Nov 2026</span></div>`
+const TABS=[['Pending match (5)'],['Correction needed (1)',1],['In progress (6)'],['Closed (2)']]
+// the stage as a pill, by who holds it: head grey, Finance blue, decision amber, payment green
+const SP={'Under review':'p-grey','In verification':'p-info','Awaiting approval':'p-chk','Payment pending':'p-ok'}
+const stagePill=s=>`<span class="pill ${SP[s]}">${s}</span>`
+const V=[
+ {t:'Pending match',w:'Invoices Antz AI has read, or is reading, that need challans before they can go to the head. Unchanged from today.',dd:['All vendors','All statuses'],
+  th:['SL.NO','Invoice no.','Vendor','Parsing status','Uploaded by','Action'],
+  rows:[['1','<span class="b">KMS/INV/1190</span>','<span class="q">Reading…</span>',`<span class="pill p-grey">${robot}Reading</span>`,'<div class="who"><span class="av">ME</span><div>Mark Ellis<div class="q">02 Nov 26 · 2:23 PM</div></div></div>',''],
+   ['2','<span class="b">MGT/2611/118</span><div class="q">12 Oct 26</div>','<span class="b">Mysore Grain Traders</span>',`<span class="pill p-ok">${robot}Read</span>`,'<div class="who"><span class="av">ME</span><div>Mark Ellis<div class="q">02 Nov 26 · 8:15 AM</div></div></div>','<span class="btn">＋ Challan</span>'],
+   ['3','<span class="b">SAI/1022</span>','<span class="q">Not read</span>',`<span class="pill p-bad">${robot}Failed</span>`,'<div class="who"><span class="av">ME</span><div>Mark Ellis<div class="q">31 Oct 26 · 11:14 AM</div></div></div>','<span class="btn">↻ Try again</span>'],
+   ['4','<span class="b">GVF/2610/061</span><div class="q">15 Oct 26</div>','<span class="b">Green Valley Farms</span>',`<span class="pill p-chk">${robot}Needs check</span>`,'<div class="who"><span class="av">ME</span><div>Mark Ellis<div class="q">31 Oct 26 · 10:30 AM</div></div></div>','<span class="btn">＋ Challan</span>']]},
+ {t:'Correction needed',w:'Sent back by the head (or by Finance through the head). The note is on the row, so the clerk knows what to fix before opening it. The orange dot on the tab shows there is something here.',dd:['All vendors'],
+  th:['SL.NO','Bill Desk no.','Invoice no.','Vendor','Sent back by','Note','Action'],
+  rows:[['1','BD-26-0011','<span class="b">GVF/26/0918</span><div class="q">12 Oct 26</div>','<span class="b">Green Valley Farms</span>','<div class="who"><span class="av">DB</span><div>Daniel Brooks<div class="q">01 Nov 26 · 4:10 PM</div></div></div>','<span class="note">“Beetroot billed 20 kg, received 15 kg — get the corrected bill from the vendor.”</span>','<span class="btn">✎ Fix</span>']]},
+ {t:'In progress',w:'Everything the clerk has sent and is not closed: under review, with Finance, awaiting approval, approved and waiting for payment. View only. The stage pill says where it is now, and days at stage show whether it is stuck.',dd:['All vendors','All stages'],
+  th:['SL.NO','Bill Desk no.','Invoice no.','Vendor','Total','Match','Stage','Days at stage'],
+  rows:[['1','BD-26-0007','<span class="b">MGT/26/571</span><div class="q">13 Oct 26</div>','<span class="b">Mysore Grain Traders</span>','<span class="r">₹73,426.50</span>','<span class="mis">2 items mismatch</span>',stagePill('Under review'),'2'],
+   ['2','BD-26-0013','<span class="b">SLA/26/0412</span><div class="q">11 Oct 26</div>','<span class="b">Sri Lakshmi Agro Foods</span>','<span class="r">₹18,240</span>','Matched',stagePill('In verification'),'5'],
+   ['3','BD-26-0016','<span class="b">AFM/INV/0399</span><div class="q">9 Oct 26</div>','<span class="b">Annapurna Fruit Mart</span>','<span class="r">₹9,870</span>','Matched',stagePill('Awaiting approval'),'<span class="mis">9</span>'],
+   ['4','BD-26-0019','<span class="b">CFF/26/221</span><div class="q">8 Oct 26</div>','<span class="b">Coastal Fresh Fish Co.</span>','<span class="r">₹31,600</span>','Matched',stagePill('Payment pending'),'3']]},
+ {t:'Closed',w:'Paid or rejected. The outcome, its date, and the payment reference or rejection reason.',dd:['All vendors','Paid and rejected'],
+  th:['SL.NO','Bill Desk no.','Invoice no.','Vendor','Total','Outcome','Reference or reason'],
+  rows:[['1','BD-26-0002','<span class="b">GVF/26/0901</span><div class="q">3 Oct 26</div>','<span class="b">Green Valley Farms</span>','₹12,480','<span class="pill p-ok">Paid</span><div class="q" style="margin-top:4px">28 Oct 26</div>','UTR HDFC0026431187'],
+   ['2','BD-26-0005','<span class="b">BVS/26/118</span><div class="q">5 Oct 26</div>','<span class="b">Bharat Vet Supplies</span>','₹4,320','<span class="pill p-bad">Rejected</span><div class="q" style="margin-top:4px">26 Oct 26</div>','<span class="note">“Rates above the agreed contract — vendor to re-bill.”</span>']]}]
+document.getElementById('root').innerHTML=V.map((v,k)=>`<div class="opt"><h2>${k+1} · ${v.t}${k===0?'':''}</h2><p>${v.w}</p><div class="page">${head(TABS,TABS[k][0],v.dd)}<table><thead><tr>${v.th.map(h=>`<th class="${/Total|Days/.test(h)?'r':''}">${h}</th>`).join('')}</tr></thead><tbody>${v.rows.map(r=>`<tr>${r.map((c,i)=>`<td class="${/Total|Days/.test(v.th[i])?'r':''}">${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`).join('')
+ +`<div class="opt"><h2>Alternative · three tabs</h2><p>Pending match and Correction needed merged into one To do list, each row with a status pill. Fewer tabs, but a returned invoice is easier to miss.</p><div class="page"><div class="l2" style="margin:0"><span class="on">To do (6)</span><span>In progress (6)</span><span>Closed (2)</span></div></div></div>`
+</script></body></html>

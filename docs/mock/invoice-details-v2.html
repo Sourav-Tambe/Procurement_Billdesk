@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invoice details v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Figma capture: the Capture / Send to Figma toolbar shows when the address ends in #figmacapture -->
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<!-- Mock for Sourav (2 Nov): Invoice details reworked from a reference (an AP tool's invoice page), kept in the Antz web
+     look: Antz shell and tokens, mint table header, green primary, Inter. Taken from the reference: a one-line summary
+     under the title, the rail under the header, an information card with key-value pairs and a totals block, and a
+     right column of checks, the next step, documents and activity. Not taken: its tabs (Bill Desk dropped tabs on this
+     page), black buttons, beige palette. Data: BD-26-0007, BD-26-0006, BD-26-0016 from the sample. -->
+<style>
+:root{--bg:#EFF5F2;--white:#fff;--text:#44544A;--quiet:#7A8684;--line:#DAE7DF;--outline:#C3CEC7;--display:#E8F4F2;--surface:#F2FFF8;--green:#37BD69;--greenDark:#006D35;--tert:#FA6140;--tertBg:#FFBDA833;--err:#E93353;--errBg:#FFD3D3;--notes:#FCF4AE;--amber:#B26A00;--info:#dff9f7;--ink:#1F415B;--side:#1F415B;--add:#00AFD6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Inter,sans-serif;color:var(--text);font-size:14px}
+a{color:inherit;text-decoration:none}
+.svg{width:20px;height:20px;flex-shrink:0}
+/* switcher (mock only) */
+.switch{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:9;background:#1F2A26;color:#fff;border-radius:24px;padding:6px;display:flex;gap:4px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.switch button{font:500 13px Inter;border:0;border-radius:18px;padding:8px 14px;background:transparent;color:#cfd8d4;cursor:pointer}.switch button.on{background:#fff;color:#1F2A26}
+/* Antz shell */
+.shell{display:grid;grid-template-columns:280px minmax(0,1fr);min-height:100vh}
+.nav{padding:20px 14px}
+.logo{display:flex;align-items:center;gap:10px;padding:0 10px 26px;font:600 26px Inter;color:var(--green);letter-spacing:2px}.logo i{width:38px;height:38px;border-radius:50%;border:2px solid #1F515B;display:block}
+.navsec{font-size:12px;font-weight:500;color:var(--quiet);letter-spacing:.06em;padding:0 12px 10px}
+.navi{display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;color:var(--text);margin-bottom:6px}
+.navi .c{margin-left:auto;font-size:14px}.navi.on{background:var(--side);color:#fff}
+.main{padding:16px 28px 80px;min-width:0}
+.top{display:flex;justify-content:flex-end;margin-bottom:6px}
+.who{display:flex;align-items:center;gap:10px;background:#fff;border-radius:28px;padding:6px 16px 6px 6px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font:600 13px Inter;background:var(--display);color:var(--greenDark)}
+.who b{display:block;font-size:14px;font-weight:500}.who small{color:var(--quiet);font-size:12px}
+.crumb{font-size:16px;color:var(--quiet);margin:0 0 18px}.crumb span{color:var(--text)}
+/* header */
+.card{background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(76,78,100,.08)}
+.hdr{padding:24px}
+.hrow{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.back{width:36px;height:36px;display:grid;place-items:center;border-radius:50%;color:var(--text);margin-top:2px}
+.htxt{flex:1;min-width:0}
+.hline{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hline h1{margin:0;font-size:28px;font-weight:400;color:var(--text)}
+.pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:13px;font-size:12px;font-weight:600;white-space:nowrap}
+.pill i{width:6px;height:6px;border-radius:50%;background:currentColor;display:block}
+.ok{background:var(--display);color:var(--greenDark)}.warn{background:var(--tertBg);color:var(--tert)}.bad{background:var(--errBg);color:var(--err)}.chk{background:var(--notes);color:var(--amber)}.inf{background:var(--info);color:var(--ink)}.qt{background:rgba(0,0,0,.05);color:var(--text)}
+.summ{margin-top:6px;font-size:15px;color:var(--quiet)}.summ b{color:var(--text);font-weight:500}
+.acts{display:flex;gap:12px;align-items:center;position:relative}
+.btn{height:40px;padding:0 18px;border-radius:8px;font:500 15px Inter;text-transform:uppercase;letter-spacing:.3px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--outline);background:#fff;color:var(--greenDark);white-space:nowrap;cursor:pointer}
+.btn.pri{background:var(--green);border-color:var(--green);color:#fff}
+.btn.pri .cv{border-left:1px solid rgba(255,255,255,.45);padding-left:10px;margin-left:4px;display:flex}
+.kb{width:36px;height:36px;display:grid;place-items:center;border-radius:50%;color:var(--text)}
+.drop{position:absolute;right:0;top:48px;width:340px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.14);padding:6px;z-index:3}
+.drop div{padding:12px 12px;border-radius:8px}.drop div:hover{background:var(--surface)}
+.drop b{display:block;font-size:14px;font-weight:600;color:var(--text)}.drop small{color:var(--quiet);font-size:13px}.drop .amt{float:right;font-weight:600;color:var(--text)}
+/* send-back comment, highlighted above the rail when the invoice was sent back */
+.sbk{display:flex;gap:14px;margin-top:20px;padding:16px 18px;border-radius:10px;background:#FFF1EB;border:1px solid #FFD6C7}
+.sbk .ai{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font:600 12px Inter;flex-shrink:0}
+.sbt{flex:1;min-width:0}.sbh{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.sbh b{font-size:15px;font-weight:600}.sbh span{font-size:13px;color:var(--quiet)}
+.sbt p{margin:6px 0 0;font-size:16px;line-height:1.5;color:var(--text)}
+/* rail (as built: ui/InvoicePipeline.js) */
+.rail{display:flex;margin-top:22px;padding:18px 24px;border-radius:16px;border:1px solid var(--line);background:rgba(232,244,242,.4)}
+.st{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}.st.last{flex:none}
+.st .t{display:flex;align-items:center}
+.dot{width:32px;height:32px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;color:#fff}
+.dot.d{background:var(--text)}.dot.x{background:var(--err)}.dot.c{border:2px solid var(--green);background:#fff}.dot.c i{width:10px;height:10px;border-radius:50%;background:var(--green)}.dot.w{border:2px solid var(--outline)}
+.ln{flex:1;height:8px;margin:0 12px;background-image:repeating-linear-gradient(90deg,var(--outline) 0 1.5px,transparent 1.5px 4px)}.ln.d{background-image:repeating-linear-gradient(90deg,var(--text) 0 1.5px,transparent 1.5px 4px)}
+.st .l{font-size:15px;font-weight:500}.st .l.q{color:var(--quiet)}
+.st .s{font-size:13px;color:var(--quiet);margin-top:2px;min-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:12px}.st .s.x{color:var(--err)}.st .s.c{color:var(--greenDark)}
+/* body grid */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:24px;margin-top:24px;align-items:start}
+.col{display:flex;flex-direction:column;gap:24px;min-width:0}
+.pad{padding:24px}
+.ch{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 18px}
+.ch h2{margin:0;font-size:18px;font-weight:600;color:var(--text)}.ch h2 span{font-weight:400;color:var(--quiet)}
+.lnk{display:inline-flex;align-items:center;gap:6px;font:600 14px Inter;color:var(--greenDark);cursor:pointer;white-space:nowrap}
+.kv{display:grid;grid-template-columns:1fr 1fr;column-gap:40px;padding-top:18px;border-top:1px solid var(--line)}
+.kv div{display:flex;justify-content:space-between;gap:16px;padding:9px 0;font-size:15px}
+.kv dt{color:var(--quiet)}.kv dd{margin:0;font-weight:500;color:var(--text);text-align:right}
+.kv dd a{color:var(--greenDark);text-decoration:underline;text-underline-offset:2px}
+.kv dd.x{color:var(--tert)}
+/* challans: a compact card per challan, above the items */
+.subh{display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px}
+.subh h3{margin:0;font-size:15px;font-weight:600;color:var(--text)}.subh h3 span{font-weight:400;color:var(--quiet)}
+.chg{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.chc{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer}
+.chc:hover{border-color:var(--outline);background:var(--surface)}
+.pg{width:30px;height:38px;border:1px solid var(--outline);border-radius:3px;position:relative;flex-shrink:0;background:#fff}
+.pg:before{content:'';position:absolute;right:-1px;top:-1px;border-style:solid;border-width:0 8px 8px 0;border-color:transparent var(--bg) var(--line) transparent}
+.pg:after{content:'';position:absolute;left:6px;right:6px;top:13px;height:16px;background:repeating-linear-gradient(var(--outline) 0 1.5px,transparent 1.5px 5px)}
+.chc .tx{flex:1;min-width:0}.chc b{display:block;font-size:14px;font-weight:600;color:var(--text)}
+.chc small{display:block;color:var(--quiet);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chc .ey{color:var(--quiet)}
+table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--outline);border-radius:8px;overflow:hidden;margin-top:0}
+th{background:var(--display);text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;color:var(--ink);padding:14px 16px;white-space:nowrap}
+td{padding:12px 16px;border-top:1px solid var(--line);font-size:14px;vertical-align:middle}
+.r{text-align:right}
+.it{display:flex;align-items:center;gap:12px}.th{width:36px;height:36px;border-radius:6px;background:#d9cdb8;flex-shrink:0}
+.it b{font-weight:600;color:#111;display:block}.it small{color:var(--quiet);font-size:12px}
+.flag{display:inline-flex;margin-left:8px;height:22px;align-items:center;padding:0 8px;border-radius:6px;font-size:12px;font-weight:600;background:var(--tertBg);color:var(--tert);white-space:nowrap}
+td.o{color:var(--tert);font-weight:600}
+tr.hl td{background:#FFF7F3}
+.tot{margin:18px 0 0 auto;width:340px;font-size:15px}
+.tot div{display:flex;justify-content:space-between;padding:7px 0}.tot dt{color:var(--quiet)}.tot dd{margin:0;font-weight:500}
+.tot .g{border-top:1px solid var(--line);margin-top:6px;padding-top:12px}.tot .g dd,.tot .g dt{font-weight:600;color:var(--text)}
+.tot .alt dd{color:var(--greenDark)}
+/* right column */
+.cks{display:flex;flex-direction:column;gap:14px}
+.ck{display:grid;grid-template-columns:28px 1fr;gap:12px}
+.ci{width:28px;height:28px;border-radius:50%;display:grid;place-items:center}
+.ci.p{background:var(--display);color:var(--greenDark)}.ci.f{background:var(--tertBg);color:var(--tert)}.ci.n{background:rgba(0,0,0,.05);color:var(--quiet)}
+.ck b{font-weight:600;display:block;font-size:14px}.ck small{color:var(--quiet);font-size:13px}
+.next{border-radius:10px;padding:18px 20px;background:var(--info);border:1px solid #bfe9e5}
+.next.t{background:#FFF1EB;border-color:#FFD6C7}
+.next h3{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:15px;font-weight:600;color:var(--ink)}.next.t h3{color:var(--tert)}
+.next p{margin:0;font-size:14px;line-height:1.55;color:var(--text)}
+.docs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.doc{border:1px solid #E0E0E0;border-radius:8px;overflow:hidden;background:#fff}
+.doc .tl{height:84px;margin:8px;border-radius:4px;background:rgba(255,189,168,.3);display:grid;place-items:center}
+.doc .nm{display:flex;align-items:center;gap:4px;padding:0 6px 8px 10px;font-size:12px}.doc .nm span:first-child{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* activity: a vertical rail, newest first, scrolling inside its card */
+.acty{max-height:330px;overflow-y:auto;margin-right:-8px;padding-right:8px;position:relative}
+.acty::-webkit-scrollbar{width:6px}.acty::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+.vr{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;position:relative;padding-bottom:18px}
+.vr:not(:last-child):before{content:'';position:absolute;left:13px;top:32px;bottom:4px;width:2px;background-image:repeating-linear-gradient(180deg,var(--outline) 0 1.5px,transparent 1.5px 4px)}
+.vd{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.vd.ok{background:var(--text)}.vd.bad{background:var(--err)}.vd.warn{background:var(--tert)}.vd.ai{background:#fff;border:2px solid var(--outline);color:var(--text)}
+.vr .vt{display:flex;justify-content:space-between;gap:10px}.vr b{font-size:14px;font-weight:600;color:var(--text)}.vr time{font-size:12px;color:var(--quiet);white-space:nowrap;padding-top:2px}
+.vr small{display:block;font-size:12px;color:var(--quiet);margin-top:2px}
+.vr .nt{margin-top:6px;font-size:13px;line-height:1.45;padding:8px 10px;border-radius:6px;background:rgba(232,244,242,.7)}.vr .nt.sb{background:#FFF1EB}
+.vr.first .vd.ok{background:#fff;border:2px solid var(--green);color:var(--green)}
+/* the full history in a right side sheet */
+.scrim{position:fixed;inset:0;background:rgba(18,30,25,.35);z-index:20;display:none}
+.sheet{position:fixed;top:0;right:0;bottom:0;width:520px;max-width:100%;background:#fff;z-index:21;display:none;flex-direction:column;box-shadow:-12px 0 32px rgba(0,0,0,.12)}
+.open .scrim{display:block}.open .sheet{display:flex}
+.shh{display:flex;align-items:center;gap:12px;padding:20px 24px;border-bottom:1px solid var(--line)}
+.shh h2{margin:0;font-size:20px;font-weight:500;flex:1}.shh small{display:block;font-size:13px;color:var(--quiet);margin-top:2px}
+.shh .x{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:var(--text)}
+.shb{flex:1;overflow-y:auto;padding:20px 24px;background:var(--bg)}
+.day{font-size:12px;font-weight:600;color:var(--quiet);text-transform:uppercase;letter-spacing:.06em;margin:4px 0 12px}
+.daybox{background:#fff;border-radius:10px;padding:18px 18px 2px;margin-bottom:18px}
+.ae{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:start;padding:10px 0;border-top:1px solid var(--line)}.ae:first-child{border-top:0;padding-top:0}
+.ae .ai{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font:600 11px Inter}
+.ai.me{background:var(--display);color:var(--greenDark)}.ai.db{background:var(--info);color:var(--ink)}.ai.rm{background:var(--notes);color:var(--amber)}.ai.ai2{background:rgba(0,0,0,.05);color:var(--text)}
+.ae b{font-weight:500;font-size:14px;display:block}.ae small{color:var(--quiet);font-size:12px}.ae time{color:var(--quiet);font-size:12px;white-space:nowrap}
+.ae .nt{margin-top:6px;font-size:13px;line-height:1.45;padding:8px 10px;border-radius:6px;background:#FFF1EB}
+</style></head><body>
+
+<div class="switch" id="sw"></div>
+<div id="app"></div>
+
+<script>
+const I = {
+  back: '<svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>',
+  chk: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+  x: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  alr: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>',
+  dash: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 12h10"/></svg>',
+  eye: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  chev: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg>',
+  down: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>',
+  keb: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>',
+  truck: '<svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 6h12v10H2zM14 10h4l3 3v3h-7"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>',
+  rec: '<svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>',
+  bulb: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>',
+  pdf: '<img src="../../public/icons/file-pdf.svg" width="34" height="34" alt="PDF">'
+}
+const STAGES = ['Uploaded', 'Challans linked', 'Head review', 'Finance check', 'Approval', 'Payment']
+const rail = (now, bad, state, done) => `<div class="rail">${STAGES.map((l, k) => {
+  const d = k < now, c = k === now, last = k === STAGES.length - 1
+  const dot = d ? `<div class="dot d">${I.chk}</div>` : c && bad ? `<div class="dot x">${I.x}</div>` : c ? '<div class="dot c"><i></i></div>' : '<div class="dot w"></div>'
+  return `<div class="st ${last ? 'last' : ''}"><div class="t">${dot}${last ? '' : `<div class="ln ${d ? 'd' : ''}"></div>`}</div><div><div class="l ${d || c ? '' : 'q'}">${l}</div><div class="s ${c ? (bad ? 'x' : 'c') : ''}">${d ? done[k] || '' : c ? state : ''}</div></div></div>`
+}).join('')}</div>`
+
+const S = {
+  head: {
+    tab: 'Head · with discrepancies', role: ['DB', 'Daniel Brooks', 'Bill Desk head'],
+    no: 'MGT/26/571', pill: ['warn', 'With discrepancies'],
+    summ: '<b>Mysore Grain Traders</b> · ₹73,426.50 · BD-26-0007 · uploaded 14 Oct, 10:12 AM by Mark Ellis',
+    acts: `<span class="btn">Send back</span><span class="btn pri">Approve</span><span class="kb">${I.keb}</span>`,
+    rail: rail(2, false, 'Under review', ['Mark Ellis · 14 Oct', 'Mark Ellis · 14 Oct']),
+    kv: [['Vendor', 'Mysore Grain Traders'], ['Invoice date', '13 Oct 26'], ['Items', '6 · 2 differ', 'x'], ['Bill Desk no.', 'BD-26-0007'], ['Uploaded by', 'Mark Ellis · 14 Oct']],
+    chs: [['MGT-3707', '4 items · Main Kitchen', '12 Oct 26 · Anand Rao'], ['MGT-3713', '2 items · Central Store', '12 Oct 26 · Lakshmi Menon']],
+    rows: [['JAGGERY BLOCK', 'GRC-0042', '20 kg', '20 kg', '65.10', '1,302.00'], ['RICE SONA MASOORI', 'GRC-0040', '55 kg', '55 kg', '60.90', '3,349.50'], ['Wheat bran', 'FED-0022', '15 kg', '15 kg', '3,570.00', '53,550.00'], ['Rice (broken)', 'Billed 10 kg more', '150 kg', '160 kg', '60.90', '9,744.00', '+10 kg'], ['PEANUTS ROASTED', 'GRC-0045', '8 kg', '8 kg', '152.25', '1,218.00'], ['Grains mix (ragi, bajra, maize)', 'Billed 5 kg less', '75 kg', '70 kg', '60.90', '4,263.00', '−5 kg']],
+    tot: [['Lines add up to', '₹73,426.50'], ['Printed on the bill', '₹73,426.50'], ['Invoice total', '₹73,426.50', 'g']],
+    passed: '5 of 6 checks passed',
+    checks: [['p', 'Vendor on record', 'GSTIN matches Mysore Grain Traders'], ['p', 'Invoice number not used before', 'No other invoice carries MGT/26/571'], ['p', 'Challans belong to this vendor', '2 challans, both from Mysore Grain Traders'], ['f', 'Quantities differ from received', 'Rice (broken) +10 kg · Grains mix −5 kg'], ['p', 'Printed total matches the lines', '₹73,426.50 on both'], ['p', 'Invoice PDF attached', '3 documents']],
+    next: ['', 'What needs to happen', 'You decide how the two quantity differences are paid. <b>Pay as received</b> sends ₹73,122 to Finance; <b>Accept as billed</b> sends ₹73,426.50. Or send it back if the vendor should correct the bill.'],
+    docs: ['MGT-26-571.pdf', 'MGT-3707.pdf', 'MGT-3713.pdf'],
+    act: [['ok', 'Sent to the head', 'Mark Ellis · Accounts clerk', '14 Oct', '2:40 PM'], ['warn', '2 items differ from received', 'Bill Desk', '14 Oct', '2:31 PM', 'Rice (broken) billed 10 kg more · Grains mix billed 5 kg less'], ['ok', 'Challans connected', 'Mark Ellis · Accounts clerk', '14 Oct', '2:31 PM', 'MGT-3707, MGT-3713'], ['ai', 'Antz AI read the bill', 'Antz AI', '14 Oct', '10:12 AM', '6 lines · printed total matches the lines'], ['ok', 'Attached 3 documents', 'Mark Ellis · Accounts clerk', '14 Oct', '10:11 AM', 'MGT-26-571.pdf, MGT-3707.pdf, MGT-3713.pdf'], ['ok', 'Sent to Antz AI', 'Mark Ellis · Accounts clerk', '14 Oct', '10:11 AM']]
+  },
+  clerk: {
+    tab: 'Clerk · correction needed', role: ['ME', 'Mark Ellis', 'Accounts clerk'],
+    no: 'BVS/7781', pill: ['warn', 'Correction needed'],
+    summ: '<b>Bharat Vet Supplies</b> · ₹26,706 · BD-26-0006 · uploaded 8 Oct, 9:30 AM by you',
+    acts: `<span class="btn pri">Fix invoice</span><span class="kb">${I.keb}</span>`,
+    rail: rail(2, true, 'Correction needed', ['Mark Ellis · 8 Oct', 'Mark Ellis · 8 Oct']),
+    note: ['DB', 'Daniel Brooks', 'Bill Desk head', 'Sent back 9 Oct, 7:30 AM', 'The bill copy is cut off at the GSTIN. Ask Bharat Vet for a clear scan.'],
+    kv: [['Vendor', 'Bharat Vet Supplies'], ['Invoice date', '8 Oct 26'], ['Items', '4 · all match'], ['Bill Desk no.', 'BD-26-0006'], ['Uploaded by', 'Mark Ellis · 8 Oct']],
+    chs: [['BVS-2098', '2 items · Central Store', '2 Oct 26 · Pooja Desai'], ['BVS-2107', '2 items · Central Store', '2 Oct 26 · Lakshmi Menon']],
+    rows: [['MULTIVITAMIN POWDER', 'GRC-0048', '500 gm', '500 gm', '2.83', '1,416.00'], ['MEALWORMS LIVE', 'NV-0063', '200 gm', '200 gm', '53.76', '10,752.00'], ['MAZURI PRIMATE DIET', 'FED-0018', '4 × 10 kg/bag', '4 × 10 kg/bag', '2,572.50', '10,290.00'], ['Calcium powder', 'GRC-0050', '1500 gm', '1500 gm', '2.83', '4,248.00']],
+    tot: [['Lines add up to', '₹26,706.00'], ['Printed on the bill', '₹26,706.00'], ['Invoice total', '₹26,706.00', 'g']],
+    passed: '5 of 6 checks passed',
+    checks: [['f', 'Vendor GSTIN not readable', 'The bill copy is cut off at the GSTIN'], ['p', 'Invoice number not used before', 'No other invoice carries BVS/7781'], ['p', 'Challans belong to this vendor', '2 challans, both from Bharat Vet Supplies'], ['p', 'Quantities match received', 'All 4 items'], ['p', 'Printed total matches the lines', '₹26,706 on both'], ['p', 'Invoice PDF attached', '3 documents']],
+    next: ['t', 'Sent back by Daniel Brooks · 9 Oct, 7:30 AM', '“The bill copy is cut off at the GSTIN. Ask Bharat Vet for a clear scan.” Replace the invoice PDF and save; it goes back to the head.'],
+    docs: ['BVS-7781.pdf', 'BVS-2098.pdf', 'BVS-2107.pdf'],
+    act: [['bad', 'Sent back to you', 'Daniel Brooks · Bill Desk head', '9 Oct', '7:30 AM', '“The bill copy is cut off at the GSTIN. Ask Bharat Vet for a clear scan.”'], ['ok', 'Sent to the head', 'Mark Ellis · Accounts clerk', '8 Oct', '11:30 AM'], ['ok', 'Challans connected', 'Mark Ellis · Accounts clerk', '8 Oct', '9:31 AM', 'BVS-2098, BVS-2107'], ['ok', 'Attached 3 documents', 'Mark Ellis · Accounts clerk', '8 Oct', '9:30 AM', 'BVS-7781.pdf, BVS-2098.pdf, BVS-2107.pdf'], ['ok', 'Invoice added', 'Mark Ellis · Accounts clerk', '8 Oct', '9:30 AM', 'BVS/7781']]
+  },
+  view: {
+    tab: 'Finance check · matched', role: ['ME', 'Mark Ellis', 'Accounts clerk'],
+    no: 'ND/2026/1077', pill: ['inf', 'In verification'],
+    summ: '<b>Nandi Dairy</b> · ₹14,100 · BD-26-0016 · uploaded 6 Oct, 9:30 AM by Mark Ellis',
+    acts: `<span class="kb">${I.keb}</span>`,
+    rail: rail(3, false, 'In verification', ['Mark Ellis · 6 Oct', 'Mark Ellis · 6 Oct', 'Daniel Brooks · 7 Oct']),
+    kv: [['Vendor', 'Nandi Dairy'], ['Invoice date', '6 Oct 26'], ['Items', '2 · all match'], ['Bill Desk no.', 'BD-26-0016'], ['Approved by', 'Daniel Brooks · 7 Oct']],
+    chs: [['ND-973', '2 items · Main Kitchen', '3 Oct 26 · Pooja Desai'], ['ND-974', '1 item · Main Kitchen', '3 Oct 26 · Anand Rao'], ['ND-979', '2 items · Rescue Kitchen', '5 Oct 26 · Lakshmi Menon'], ['ND-984', '1 item · Main Kitchen', '6 Oct 26 · Pooja Desai']],
+    rows: [['EGG (TABLE, WHITE) TRAY', 'DRY-0012', '30 tray', '30 tray', '190.00', '5,700.00'], ['MILK TONED 1 LTR', 'DRY-0010', '150 × 1 ltr', '150 × 1 ltr', '56.00', '8,400.00']],
+    tot: [['Lines add up to', '₹14,100.00'], ['Printed on the bill', '₹14,100.00'], ['Invoice total', '₹14,100.00', 'g']],
+    passed: 'All 6 checks passed',
+    checks: [['p', 'Vendor on record', 'GSTIN matches Nandi Dairy'], ['p', 'Invoice number not used before', 'No other invoice carries ND/2026/1077'], ['p', 'Challans belong to this vendor', '4 challans, all from Nandi Dairy'], ['p', 'Quantities match received', 'Both items'], ['p', 'Printed total matches the lines', '₹14,100 on both'], ['p', 'Invoice PDF attached', '5 documents']],
+    next: ['', 'Where it is', 'With Finance for verification since 7 Oct. Nothing for you to do; you will see it move to Awaiting approval here.'],
+    docs: ['ND-2026-1077.pdf', 'ND-973.pdf', 'ND-974.pdf', 'ND-979.pdf', 'ND-984.pdf'],
+    act: [['ok', 'Approved and sent to Finance', 'Daniel Brooks · Bill Desk head', '7 Oct', '4:10 PM'], ['ok', 'Sent to the head', 'Mark Ellis · Accounts clerk', '6 Oct', '11:30 AM'], ['ok', 'Challans connected', 'Mark Ellis · Accounts clerk', '6 Oct', '9:32 AM', 'ND-973, ND-974, ND-979, ND-984'], ['ok', 'Attached 5 documents', 'Mark Ellis · Accounts clerk', '6 Oct', '9:30 AM'], ['ok', 'Invoice added', 'Mark Ellis · Accounts clerk', '6 Oct', '9:30 AM', 'ND/2026/1077']]
+  }
+}
+
+const DOT = { ok: I.chk, bad: I.x, warn: I.alr, ai: '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a2 2 0 0 1 1 3.7V7h4a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3h4V5.7A2 2 0 0 1 12 2zM9 12a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>' }
+// one event on the vertical rail: [kind, what, who, day, time, note]; the newest wears the green ring
+const vrow = (a, first, full) => `<div class="vr ${first ? 'first' : ''}"><div class="vd ${a[0]}">${DOT[a[0]]}</div><div><div class="vt"><b>${a[1]}</b><time>${full ? a[4] : `${a[3]}, ${a[4]}`}</time></div><small>${a[2]}</small>${a[5] ? `<div class="nt ${a[0] === 'bad' ? 'sb' : ''}">${a[5]}</div>` : ''}</div></div>`
+const sheet = s => { const days = [...new Set(s.act.map(a => a[3]))]; return `<div class="scrim" data-close="1"></div><aside class="sheet"><div class="shh"><div style="flex:1"><h2>Activity</h2><small>${s.no} · ${s.act.length} events</small></div><span class="x" data-close="1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></span></div><div class="shb">${days.map(d => `<div class="day">${d} 2026</div><div class="daybox">${s.act.filter(a => a[3] === d).map(a => vrow(a, a === s.act[0], true)).join('')}</div>`).join('')}</div></aside>` }
+const ck = c => `<div class="ck"><div class="ci ${c[0]}">${c[0] === 'p' ? I.chk : c[0] === 'f' ? I.alr : I.dash}</div><div><b>${c[1]}</b><small>${c[2]}</small></div></div>`
+const page = s => `
+<div class="shell">
+  <aside class="nav">
+    <div class="logo"><i></i>antz</div>
+    <div class="navsec">BILL DESK</div>
+    <a class="navi">${I.truck}Challans<span class="c">23</span></a>
+    <a class="navi on">${I.rec}Invoices<span class="c">6</span></a>
+  </aside>
+  <main class="main">
+    <div class="top"><div class="who"><div class="av">${s.role[0]}</div><div><b>${s.role[1]}</b><small>${s.role[2]}</small></div></div></div>
+    <div class="crumb">Bill Desk / Invoices / <span>${s.no}</span></div>
+    <section class="card hdr">
+      <div class="hrow">
+        <span class="back">${I.back}</span>
+        <div class="htxt">
+          <div class="hline"><h1>${s.no}</h1><span class="pill ${s.pill[0]}"><i></i>${s.pill[1]}</span></div>
+          <div class="summ">${s.summ}</div>
+        </div>
+        <div class="acts">${s.acts}${s.drop || ''}</div>
+      </div>
+      ${s.note ? `<div class="sbk"><div class="ai db">${s.note[0]}</div><div class="sbt"><div class="sbh"><b>${s.note[1]}</b><span>${s.note[2]} · ${s.note[3]}</span><span class="pill warn" style="margin-left:auto"><i></i>Correction needed</span></div><p>“${s.note[4]}”</p></div></div>` : ''}
+      ${s.rail}
+    </section>
+    <div class="grid">
+      <div class="col">
+        <section class="card pad">
+          <div class="ch"><h2>Invoice information</h2></div>
+          <dl class="kv">${s.kv.map(([k, v, c]) => `<div><dt>${k}</dt><dd class="${c || ''}">${v}</dd></div>`).join('')}</dl>
+          <div class="subh"><h3>Challans <span>(${s.chs.length})</span></h3></div>
+          <div class="chg">${s.chs.map(c => `<div class="chc"><div class="pg"></div><div class="tx"><b>${c[0]}</b><small>${c[1]}</small><small>${c[2]}</small></div><span class="ey">${I.eye}</span></div>`).join('')}</div>
+          <div class="subh"><h3>Items <span>(${s.rows.length})</span></h3></div>
+          <table>
+            <tr><th style="width:56px">#</th><th>Item</th><th class="r">Received</th><th class="r">Billed</th><th class="r">Rate (₹)</th><th class="r">Amount (₹)</th></tr>
+            ${s.rows.map((r, k) => `<tr class="${r[6] ? 'hl' : ''}"><td>${k + 1}</td><td><div class="it"><div class="th"></div><div><b>${r[0]}${r[6] ? `<span class="flag">${r[6]}</span>` : ''}</b><small style="${r[6] ? 'color:var(--tert)' : ''}">${r[1]}</small></div></div></td><td class="r">${r[2]}</td><td class="r ${r[6] ? 'o' : ''}">${r[3]}</td><td class="r">${r[4]}</td><td class="r">${r[5]}</td></tr>`).join('')}
+          </table>
+          <dl class="tot">${s.tot.map(([k, v, c]) => `<div class="${c || ''}"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
+        </section>
+      </div>
+      <div class="col">
+        <section class="card pad">
+          <div class="ch"><h2>Attachments <span>(${s.docs.length})</span></h2>${s.role[0] === 'ME' && s.pill[1] === 'Correction needed' ? '<span class="lnk">+ Add</span>' : ''}</div>
+          <div class="docs">${s.docs.slice(0, 4).map(d => `<div class="doc"><div class="tl">${I.pdf}</div><div class="nm"><span>${d}</span><span>${I.keb}</span></div></div>`).join('')}</div>
+          ${s.docs.length > 4 ? `<div style="text-align:right;margin-top:10px"><span class="lnk">+${s.docs.length - 4} more</span></div>` : ''}
+        </section>
+        <section class="card pad">
+          <div class="ch"><h2>Activity <span>(${s.act.length})</span></h2><span class="lnk" data-open="1">View all${I.chev}</span></div>
+          <div class="acty">${s.act.map((a, k) => vrow(a, k === 0)).join('')}</div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>${sheet(s)}`
+
+const show = k => {
+  document.getElementById('app').innerHTML = page(S[k])
+  document.querySelectorAll('.switch button').forEach(b => b.classList.toggle('on', b.dataset.k === k))
+}
+document.getElementById('sw').innerHTML = Object.entries(S).map(([k, s]) => `<button data-k="${k}">${s.tab}</button>`).join('')
+document.getElementById('sw').addEventListener('click', e => { const k = e.target.dataset.k; if (k) show(k) })
+document.getElementById('app').addEventListener('click', e => { const t = e.target.closest('[data-open],[data-close]'); if (!t) return; document.getElementById('app').classList.toggle('open', !!t.dataset.open) })
+show('head')
+</script>
+</body></html>

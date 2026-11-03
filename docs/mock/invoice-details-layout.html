@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invoice details layout</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Figma capture: the Capture / Send to Figma toolbar shows when the address ends in #figmacapture -->
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<!-- Mock for Sourav (2 Nov): "split within the section to have the attachments and the activity section in right side
+     top and bottom section, move rail to top section". The stage rail moves into the header card; the details card
+     splits into the content on the left and a right column with Attachments on top and Activity below. Data from the
+     sample (BD-26-0006, BD-26-0007); Antz web theme tokens as the build uses them. -->
+<style>
+:root{--bg:#EFF5F2;--text:#44544A;--quiet:#7A8684;--line:#DAE7DF;--outline:#C3CEC7;--display:#E8F4F2;--green:#37BD69;--greenDark:#006D35;--tert:#FA6140;--err:#E93353;--grey300:#E0E0E0;--hdr:#E8F4F2;--ink:#1F415B;--add:#00AFD6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Inter,sans-serif;color:var(--text);padding:32px 40px}
+h1{font-size:24px;font-weight:600;margin:0 0 6px}
+.lead{max-width:1290px;margin:0 0 12px;font-size:14px;color:var(--quiet);line-height:1.55}.lead b{color:var(--text);font-weight:600}
+.rules{max-width:1290px;margin:0 0 28px;padding:16px 20px;background:#fff;border-radius:10px;font-size:14px;line-height:1.6}
+.rules h2{font-size:15px;margin:0 0 6px;font-weight:600}.rules ul{margin:0;padding-left:18px}
+.sc-h{display:flex;align-items:baseline;gap:12px;margin:0 0 10px}.sc-h b{font-size:16px;font-weight:600}.sc-h span{font-size:13px;color:var(--quiet)}
+.frame{max-width:1290px;margin-bottom:48px}
+.crumb{font-size:16px;color:var(--quiet);margin:0 0 14px}.crumb span{color:var(--text)}
+.title{display:flex;align-items:center;gap:14px;font-size:24px;margin:0 0 24px}
+.card{background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(76,78,100,.08);padding:24px;margin-bottom:24px}
+.head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.ttl h5{margin:0;font-size:24px;font-weight:600;display:inline}.ttl .sub{font-size:14px;color:var(--quiet);margin-left:12px}
+.acts{display:flex;gap:12px;align-items:center}
+.btn{height:40px;padding:0 20px;border-radius:8px;font:500 16px Inter;text-transform:uppercase;letter-spacing:.4px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--outline);background:#fff;color:var(--greenDark);white-space:nowrap}
+.btn.pri{background:var(--green);border-color:var(--green);color:#fff}
+.kb{width:32px;height:32px;display:grid;place-items:center;color:var(--text)}
+.pills{display:flex;align-items:center;gap:8px}
+.pill{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:12px;font-size:12px;font-weight:600}
+.ok{background:var(--display);color:var(--greenDark)}.warn{background:#FFBDA833;color:var(--tert)}
+.mis{font-size:14px;color:var(--tert)}
+.chrow{margin-top:20px;padding-top:20px;border-top:1px solid var(--line);display:flex;gap:12px;align-items:center;font-size:14px}
+.cap{font-size:12px;font-weight:600;color:var(--quiet);text-transform:uppercase;letter-spacing:.08em}
+.chrow a{color:var(--greenDark);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+/* the stage rail, as built (ui/InvoicePipeline.js) */
+.rail{display:flex;margin-top:20px;padding:20px 24px;border-radius:16px;border:1px solid var(--line);background:rgba(232,244,242,.4)}
+.st{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}.st.last{flex:none}
+.st .top{display:flex;align-items:center}
+.dot{width:36px;height:36px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;color:#fff}
+.dot.done{background:var(--text)}.dot.bad{background:var(--err)}.dot.cur{border:2px solid var(--green);background:#fff}.dot.cur i{width:12px;height:12px;border-radius:50%;background:var(--green)}.dot.wait{border:2px solid var(--outline)}
+.ln{flex:1;height:8px;margin:0 12px;background-image:repeating-linear-gradient(90deg,var(--outline) 0 1.5px,transparent 1.5px 4px)}.ln.d{background-image:repeating-linear-gradient(90deg,var(--text) 0 1.5px,transparent 1.5px 4px)}
+.st .l{font-size:16px;font-weight:500}.st .l.q{color:var(--quiet)}
+.st .s{font-size:14px;color:var(--quiet);margin-top:2px;min-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:16px}.st .s.bad{color:var(--err)}.st .s.cur{color:var(--greenDark)}
+/* details card: content left, side column right */
+.split{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:0}
+.main{padding-right:24px;display:flex;flex-direction:column;gap:24px;min-width:0}
+.side{padding-left:24px;border-left:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.tile{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:8px;background:rgba(31,81,91,.08)}.tile.a{background:rgba(0,175,214,.08)}
+.tile .ic{width:28px;height:28px;color:var(--ink)}.tile.a .ic,.tile.a .v{color:var(--add)}
+.tile .k{font-size:14px}.tile .v{font-size:16px;font-weight:500;color:#1F515B}
+.sec{font-size:16px;font-weight:500;margin:0 0 16px}.sec span{font-weight:400;color:var(--quiet)}
+table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--outline);border-radius:8px;overflow:hidden;font-size:14px}
+th{background:var(--hdr);text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;color:var(--ink);padding:16px}
+td{padding:12px 16px;border-top:1px solid var(--line);color:var(--text)}td.r,th.r{text-align:right}
+.it{display:flex;align-items:center;gap:12px}.th{width:40px;height:40px;border-radius:6px;background:#d9cdb8;flex-shrink:0}
+.it b{display:block;font-weight:600;color:#111}.it small{color:var(--quiet)}
+.it small.m{color:var(--tert)}td.o{color:var(--tert);font-weight:600}
+.chs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.ch{display:flex;align-items:center;gap:16px;border:1px solid var(--line);border-radius:10px;padding:16px}
+.pg{width:44px;height:56px;border:1px solid var(--outline);border-radius:3px;background:linear-gradient(#fff,#fff) padding-box;position:relative;flex-shrink:0}
+.pg:after{content:'';position:absolute;left:8px;right:8px;top:18px;height:22px;background:repeating-linear-gradient(var(--outline) 0 2px,transparent 2px 6px)}
+.ch b{display:block;font-size:16px;font-weight:600}.ch small{display:block;color:var(--quiet);font-size:14px}
+/* side: attachments (document cards) on top, activity below */
+.sh{display:flex;align-items:center;justify-content:space-between;margin:0 0 16px}.sh .sec{margin:0}
+.lnk{font:600 14px Inter;color:var(--greenDark);text-transform:uppercase}
+.docs{display:grid;grid-template-columns:repeat(2,150px);gap:12px;justify-content:space-between}
+.pdf{width:150px;background:#fff;border:1px solid var(--grey300);border-radius:8px;overflow:hidden}
+.pdf .tl{height:100px;margin:8px;border-radius:4px;background:rgba(255,189,168,.3);display:grid;place-items:center}
+.pdf .nm{display:flex;align-items:center;gap:4px;padding:0 4px 8px 8px;font-size:12px}.pdf .nm span:first-child{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pdf .tag{font-size:11px;color:var(--quiet);padding:0 8px 8px}
+.more{grid-column:1/-1;text-align:right}
+.div{height:1px;background:var(--line);margin:24px 0}
+.act{position:relative}
+.ev{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;padding-bottom:20px;position:relative}
+.ev:not(:last-child):before{content:'';position:absolute;left:13px;top:28px;bottom:0;width:2px;background:var(--line)}
+.av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:600;background:var(--display);color:var(--greenDark)}
+.av.h{background:#dff9f7;color:var(--ink)}.av.r{background:#FFBDA833;color:var(--tert)}.av.f{background:#FCF4AE;color:#B26A00}
+.ev b{font-size:14px;font-weight:600}.ev .w{font-size:12px;color:var(--quiet);margin-top:2px}
+.ev .n{margin-top:8px;font-size:14px;line-height:1.45;padding:10px 12px;border-radius:8px;background:rgba(232,244,242,.6)}
+.ev .n.t{background:#FFBDA826}
+</style></head><body>
+
+<h1>Invoice details: rail on top, attachments and activity on the right</h1>
+<p class="lead"><b>Layout.</b> The stage rail moves into the header card, under the title and challans. The details card splits: on the left the info tiles, Items and Challans, as now; on the right a 360px column with <b>Attachments</b> on top and <b>Activity</b> below. Because every file now has room, the header no longer carries a document card.</p>
+<div class="rules"><h2>How it holds up</h2><ul>
+<li><b>Attachments:</b> every file as a document card, two to a row (PDF icon, or a photo's thumbnail; name; ⋮ View / Download). Past four files: the first four and "+n more", which opens the viewer. The clerk holding the invoice gets "+ Add".</li>
+<li><b>Activity:</b> the invoice's trail, newest first: who (initials in their role's colour), what, when, and any note in a box (a send-back note in the warning tint). Past five events: "Show all (n)".</li>
+<li><b>Rail:</b> as built. Who moved each done step and when; the current step's state; a return or rejection in red.</li>
+<li><b>Narrow windows:</b> under 1200px the right column drops below the content, Attachments then Activity.</li>
+</ul></div>
+
+<div id="root"></div>
+
+<script>
+const PDF = '<img src="../../public/icons/file-pdf.svg" width="40" height="40" alt="PDF">'
+const KEB = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>'
+const CHK = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12.5l4.5 4.5L19 7"/></svg>'
+const X = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+const ICO = {
+  cal: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  inr: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h12M6 9h12M6 4h3a5 5 0 0 1 0 10H6l8 7"/></svg>',
+  truck: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 6h12v10H2zM14 10h4l3 3v3h-7"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>',
+  box: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg>'
+}
+const STAGES = ['Uploaded', 'Matched', 'Head review', 'Finance check', 'Approval', 'Payment']
+const rail = (now, bad, state, done) => `<div class="rail">${STAGES.map((l, k) => {
+  const d = k < now, c = k === now, last = k === STAGES.length - 1
+  const dot = d ? `<div class="dot done">${CHK}</div>` : c && bad ? `<div class="dot bad">${X}</div>` : c ? '<div class="dot cur"><i></i></div>' : '<div class="dot wait"></div>'
+  const sub = d ? done[k] : c ? state : ''
+  return `<div class="st ${last ? 'last' : ''}"><div class="top">${dot}${last ? '' : `<div class="ln ${d ? 'd' : ''}"></div>`}</div><div><div class="l ${d || c ? '' : 'q'}">${l}</div><div class="s ${c ? (bad ? 'bad' : 'cur') : ''}">${sub}</div></div></div>`
+}).join('')}</div>`
+const docCard = d => `<div class="pdf"><div class="tl">${PDF}</div><div class="nm"><span>${d}</span><span>${KEB}</span></div></div>`
+const ev = e => `<div class="ev"><div class="av ${e.r}">${e.i}</div><div><b>${e.a}</b><div class="w">${e.w}</div>${e.n ? `<div class="n ${e.t ? 't' : ''}">${e.n}</div>` : ''}</div></div>`
+
+const S = [
+  { t: '1. Clerk · Correction needed', why: '3 attachments, 4 events; the head\'s send-back note is the newest event.',
+    no: 'BVS/7781', bd: 'BD-26-0006', vendor: 'Bharat Vet Supplies', pills: '<span class="pill ok">Matched</span>',
+    acts: `<span class="btn pri">Fix</span><span class="kb">${KEB}</span>`, ch: ['BVS-2098', 'BVS-2107'],
+    rail: rail(1, true, 'Correction needed', ['Mark Ellis · 8 Oct 26']),
+    tiles: ['8 Oct 26', '₹26,706', '2', '4'],
+    items: [['MULTIVITAMIN POWDER', 'GRC-0048', '500 gm', '500 gm', '₹1,416'], ['MEALWORMS LIVE', 'NV-0063', '200 gm', '200 gm', '₹10,752'], ['MAZURI PRIMATE DIET', 'FED-0018', '4 × 10 kg/bag', '4 × 10 kg/bag', '₹10,290'], ['Calcium powder', 'GRC-0050', '1500 gm', '1500 gm', '₹4,248']],
+    chs: [['BVS-2098', '2 items · Central Store', '2 Oct 26 · Pooja Desai'], ['BVS-2107', '2 items · Central Store', '2 Oct 26 · Lakshmi Menon']],
+    docs: ['BVS-7781.pdf', 'BVS-2098.pdf', 'BVS-2107.pdf'], add: true,
+    evs: [
+      { i: 'DB', r: 'r', a: 'Sent back to the clerk', w: 'Daniel Brooks · Bill Desk head · 9 Oct, 7:30 AM', n: '“The bill copy is cut off at the GSTIN. Ask Bharat Vet for a clear scan.”', t: true },
+      { i: 'ME', a: 'Sent to the head', w: 'Mark Ellis · Accounts clerk · 8 Oct, 11:30 AM' },
+      { i: 'ME', a: 'Attached 3 documents', w: 'Mark Ellis · Accounts clerk · 8 Oct, 9:30 AM', n: 'BVS-7781.pdf, BVS-2098.pdf, BVS-2107.pdf' },
+      { i: 'ME', a: 'Invoice added', w: 'Mark Ellis · Accounts clerk · 8 Oct, 9:30 AM', n: 'BVS/7781 · BVS-2098, BVS-2107' }
+    ] },
+  { t: '2. Head · Under review · with discrepancies · many files, long history', why: 'Six files: four shown and "+2 more". Seven events: five shown and "Show all (7)".',
+    no: 'MGT/26/571', bd: 'BD-26-0007', vendor: 'Mysore Grain Traders', pills: '<span class="pill warn">With discrepancies</span><span class="mis">2 items mismatch</span>',
+    acts: '<span class="btn">Send back</span><span class="btn">Accept as billed</span><span class="btn pri">Pay as received</span>', ch: ['MGT-3707', 'MGT-3713'],
+    rail: rail(2, false, 'Under review', ['Mark Ellis · 14 Oct 26', 'Mark Ellis · 14 Oct 26']),
+    tiles: ['13 Oct 26', '₹73,426.50', '2', '6'],
+    items: [['JAGGERY BLOCK', 'GRC-0042', '20 kg', '20 kg', '₹1,302'], ['RICE SONA MASOORI', 'GRC-0040', '55 kg', '55 kg', '₹3,349.50'], ['Wheat bran', 'Billed 5 kg more than received', '10 kg', '15 kg', '₹53,550', true], ['Groundnut cake', 'Billed 2 kg less than received', '12 kg', '10 kg', '₹4,200', true]],
+    chs: [['MGT-3707', '4 items · Main Kitchen', '12 Oct 26 · Anand Rao'], ['MGT-3713', '2 items · Central Store', '12 Oct 26 · Lakshmi Menon']],
+    docs: ['MGT-26-571.pdf', 'MGT-3707.pdf', 'MGT-3713.pdf', 'Weighbridge-slip-14-Oct.pdf', 'Corrected-page-2.pdf', 'Vendor-letter.pdf'],
+    more: 7,
+    evs: [
+      { i: 'ME', a: 'Sent to the head again', w: 'Mark Ellis · Accounts clerk · 15 Oct, 4:05 PM' },
+      { i: 'ME', a: 'Attached 2 documents', w: 'Mark Ellis · Accounts clerk · 15 Oct, 4:02 PM', n: 'Corrected-page-2.pdf, Vendor-letter.pdf' },
+      { i: 'DB', r: 'r', a: 'Sent back to the clerk', w: 'Daniel Brooks · Bill Desk head · 15 Oct, 10:12 AM', n: '“Wheat bran billed 15 kg, received 10 kg. Get the vendor to confirm.”', t: true },
+      { i: 'ME', a: 'Sent to the head', w: 'Mark Ellis · Accounts clerk · 14 Oct, 2:40 PM' },
+      { i: 'ME', a: 'Challans connected', w: 'Mark Ellis · Accounts clerk · 14 Oct, 2:31 PM', n: 'MGT-3707, MGT-3713' }
+    ] }
+]
+
+document.getElementById('root').innerHTML = S.map(s => `
+<div class="sc-h"><b>${s.t}</b><span>${s.why}</span></div>
+<div class="frame">
+  <div class="crumb">Bill Desk / Invoices / <span>${s.no}</span></div>
+  <div class="title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>Invoice</div>
+  <div class="card">
+    <div class="head"><div class="ttl"><h5>${s.no}</h5><span class="sub">${s.bd} · ${s.vendor}</span></div><div class="acts">${s.acts}</div></div>
+    <div class="pills">${s.pills}</div>
+    <div class="chrow"><span class="cap">Challans</span><span>${s.ch.map(c => `<a>${c}</a>`).join(', ')}</span></div>
+    ${s.rail}
+  </div>
+  <div class="card"><div class="split">
+    <div class="main">
+      <div class="tiles">
+        <div class="tile a">${ICO.cal}<div><div class="k">Invoice date</div><div class="v">${s.tiles[0]}</div></div></div>
+        <div class="tile">${ICO.inr}<div><div class="k">Total</div><div class="v">${s.tiles[1]}</div></div></div>
+        <div class="tile">${ICO.truck}<div><div class="k">Challans</div><div class="v">${s.tiles[2]}</div></div></div>
+        <div class="tile">${ICO.box}<div><div class="k">Items</div><div class="v">${s.tiles[3]}</div></div></div>
+      </div>
+      <div><div class="sec">Items <span>(${s.items.length})</span></div>
+        <table><tr><th style="width:72px">SL.NO</th><th>Item</th><th class="r">Received</th><th class="r">Billed</th><th class="r">Amount</th></tr>
+        ${s.items.map((r, k) => `<tr><td>${k + 1}</td><td><div class="it"><div class="th"></div><div><b>${r[0]}</b><small class="${r[5] ? 'm' : ''}">${r[1]}</small></div></div></td><td class="r">${r[2]}</td><td class="r ${r[5] ? 'o' : ''}">${r[3]}</td><td class="r">${r[4]}</td></tr>`).join('')}</table></div>
+      <div><div class="sec">Challans <span>(${s.chs.length})</span></div>
+        <div class="chs">${s.chs.map(c => `<div class="ch"><div class="pg"></div><div><b>${c[0]}</b><small>${c[1]}</small><small>${c[2]}</small></div></div>`).join('')}</div></div>
+    </div>
+    <div class="side">
+      <div class="sh"><div class="sec">Attachments <span>(${s.docs.length})</span></div>${s.add ? '<span class="lnk">+ Add</span>' : ''}</div>
+      <div class="docs">${s.docs.slice(0, 4).map(docCard).join('')}${s.docs.length > 4 ? `<span class="more lnk">+${s.docs.length - 4} more</span>` : ''}</div>
+      <div class="div"></div>
+      <div class="sh"><div class="sec">Activity</div>${s.more ? `<span class="lnk">Show all (${s.more})</span>` : ''}</div>
+      <div class="act">${s.evs.map(ev).join('')}</div>
+    </div>
+  </div></div>
+</div>`).join('')
+</script>
+</body></html>

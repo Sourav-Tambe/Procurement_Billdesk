@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invoice pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EFF5F2;--text:#44544A;--quiet:#7A8684;--line:#DAE7DF;--outline:#C3CEC7;--green:#37BD69;--gdark:#006D35;--tint:#E8F4F2;--onbg:#E1F9ED;--ink:#1F515B;--tert:#FA6140;--tert20:#FFBDA833;--err:#E93353;--errbg:#FFD3D3;--notes:#FCF4AE;--amber:#B26A00;--sec:#dff9f7;--addp:#00AFD6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,sans-serif;color:var(--text);padding:32px}
+h1{font-size:24px;font-weight:600;margin:0 0 6px}.lead{margin:0 0 24px;color:var(--quiet);font-size:14px;max-width:960px}
+.panel{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px}.panel h2{font-size:18px;font-weight:600;margin:0 0 4px}.panel .why{font-size:14px;color:var(--quiet);margin:0 0 20px}
+.pipe{position:relative;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));column-gap:40px;padding:0 0 110px 44px}
+.stage{display:flex;flex-direction:column;gap:44px}.stage .sh{margin-bottom:-28px}
+.sh{border-bottom:2px solid var(--line);padding-bottom:8px;margin-bottom:4px}.sh b{display:block;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--ink)}.sh span{font-size:12px;color:var(--quiet)}
+.node{position:relative;z-index:1;border-radius:10px;padding:12px 14px;border:1px solid var(--line);background:#fff}
+.node .n{font-size:15px;font-weight:600}.node .d{font-size:12px;color:var(--quiet);margin-top:2px}
+.pill{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;font-size:12px;font-weight:600;white-space:nowrap}
+.ai .pill{background:var(--sec);color:var(--ink)}.wait .pill{background:var(--notes);color:var(--amber)}.work .pill{background:rgba(0,0,0,.05);color:var(--text)}.bad .pill{background:var(--tert20);color:var(--tert)}.stop .pill{background:var(--errbg);color:var(--err)}.ok .pill{background:var(--tint);color:var(--gdark)}.done .pill{background:var(--green);color:#fff}
+.node.main{border-color:var(--outline)}
+svg.arrows{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--quiet);margin-top:4px}.legend i{display:inline-block;width:28px;height:0;border-top:2px solid var(--outl,#839D8D);vertical-align:middle;margin-right:6px}.legend i.r{border-top:2px dashed var(--tert)}
+/* stepper */
+.stepper{display:flex;align-items:flex-start}.st{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;font-size:13px}
+.st:not(:last-child)::after{content:'';position:absolute;top:13px;left:calc(50% + 16px);right:calc(-50% + 16px);height:2px;background:var(--line)}
+.st.done:not(:last-child)::after{background:var(--green)}
+.dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:600;border:2px solid var(--line);background:#fff;color:var(--quiet);margin-bottom:8px;position:relative;z-index:1}
+.st.done .dot{background:var(--green);border-color:var(--green);color:#fff}.st.now .dot{border-color:var(--green);color:var(--gdark);box-shadow:0 0 0 4px var(--onbg)}
+.st .l{font-weight:500}.st.now .l{color:var(--gdark);font-weight:600}.st .t{font-size:12px;color:var(--quiet);margin-top:2px}
+.note{margin-top:16px;padding:10px 14px;border-radius:8px;background:var(--tert20);color:var(--tert);font-size:13px}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th{background:var(--tint);text-align:left;font-weight:500;padding:12px;font-size:13px}td{padding:12px;border-top:1px solid var(--line)}
+</style></head><body>
+<h1>Invoice pipeline</h1>
+<p class="lead">Eleven statuses from upload to payment. Solid arrows move forward; dashed orange arrows send it back. The clerk never chooses what to send: saving goes to review, and the head's approval goes to Finance.</p>
+
+<div class="panel"><h2>The pipeline</h2><p class="why">Who acts at each stage is in the stage header, never in the status name.</p>
+<div class="pipe" id="pipe">
+ <div class="stage"><div class="sh"><b>Read</b><span>Antz AI · optional</span></div>
+  <div class="node ai" id="reading"><span class="pill">Reading</span><div class="d">Antz AI reading the paper</div></div>
+  <div class="node stop" id="failed"><span class="pill">Read failed</span><div class="d">Try again, or enter by hand</div></div></div>
+ <div class="stage"><div class="sh"><b>Match</b><span>Accounts clerk</span></div>
+  <div class="node wait main" id="match"><span class="pill">Pending match</span><div class="d">Challans and items to match</div></div></div>
+ <div class="stage"><div class="sh"><b>Review</b><span>Bill Desk head</span></div>
+  <div class="node work main" id="review"><span class="pill">Under review</span><div class="d">Checked against the challans · Matched or With discrepancies shown as a flag</div></div>
+  <div class="node bad" id="fix"><span class="pill">Correction needed</span><div class="d">Back with a note to fix</div></div></div>
+ <div class="stage"><div class="sh"><b>Verify</b><span>Finance</span></div>
+  <div class="node work main" id="verify"><span class="pill">In verification</span><div class="d">Finance checks before approval</div></div>
+  <div class="node wait" id="await"><span class="pill">Awaiting approval</span><div class="d">In a payment-approval batch</div></div></div>
+ <div class="stage"><div class="sh"><b>Decision</b><span>Approver</span></div>
+  <div class="node ok main" id="approved"><span class="pill">Approved</span><div class="d">Cleared for payment</div></div>
+  <div class="node stop" id="rejected"><span class="pill">Rejected</span><div class="d">With a reason · next step open (BD-8)</div></div></div>
+ <div class="stage"><div class="sh"><b>Payment</b><span>Finance</span></div>
+  <div class="node wait main" id="ppend"><span class="pill">Payment pending</span><div class="d">Approved, not paid yet</div></div>
+  <div class="node done" id="paid"><span class="pill">Paid</span><div class="d">With payment reference and date</div></div></div>
+ <svg class="arrows" id="svg"><defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#839D8D"/></marker>
+  <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#FA6140"/></marker></defs></svg>
+</div>
+<div class="legend"><span><i></i>moves forward</span><span><i class="r"></i>sent back</span><span>Entering by hand starts at Pending match; Antz AI is optional.</span></div>
+</div>
+
+<div class="panel"><h2>On an invoice: the stepper</h2><p class="why">The invoice page shows the main path as steps, with who moved it and when. A return shows as a note under the step it came back to.</p>
+<div class="stepper">
+ <div class="st done"><div class="dot">✓</div><div class="l">Read</div><div class="t">Antz AI · 31 Oct, 10:30</div></div>
+ <div class="st done"><div class="dot">✓</div><div class="l">Matched</div><div class="t">Mark Ellis · 31 Oct, 11:05</div></div>
+ <div class="st now"><div class="dot">3</div><div class="l">Under review</div><div class="t">Daniel Brooks</div></div>
+ <div class="st"><div class="dot">4</div><div class="l">In verification</div><div class="t">Finance</div></div>
+ <div class="st"><div class="dot">5</div><div class="l">Approved</div><div class="t">Approver</div></div>
+ <div class="st"><div class="dot">6</div><div class="l">Paid</div><div class="t">Finance</div></div>
+</div>
+<div class="note">Correction needed once · Daniel Brooks, 1 Nov: “Beetroot billed 20 kg, received 15 kg — get the corrected bill.” Resubmitted by Mark Ellis, 1 Nov.</div>
+</div>
+
+<div class="panel"><h2>Moves</h2><p class="why">Every move between statuses, who makes it, and what it needs.</p>
+<table><thead><tr><th>From</th><th>To</th><th>Who</th><th>What it takes</th></tr></thead><tbody>
+<tr><td>—</td><td>Reading</td><td>Clerk</td><td>Invoice number and PDF, Send to Antz AI</td></tr>
+<tr><td>Reading</td><td>Pending match / Read failed</td><td>Antz AI</td><td>Read finishes or fails</td></tr>
+<tr><td>Read failed</td><td>Reading</td><td>Clerk</td><td>Try again</td></tr>
+<tr><td>— / Pending match</td><td>Under review</td><td>Clerk</td><td>Save with vendor, date, challans and every line paired</td></tr>
+<tr><td>Under review</td><td>In verification</td><td>Head</td><td>Approve; on discrepancies, choose Pay as received or Accept as billed</td></tr>
+<tr><td>Under review</td><td>Correction needed</td><td>Head</td><td>Return with a note</td></tr>
+<tr><td>Correction needed</td><td>Under review</td><td>Clerk</td><td>Fix and save</td></tr>
+<tr><td>In verification</td><td>Awaiting approval</td><td>Finance</td><td>Add to an approval batch</td></tr>
+<tr><td>In verification</td><td>Correction needed</td><td>Finance</td><td>Return with a reason (comes back to the head)</td></tr>
+<tr><td>Awaiting approval</td><td>Approved / Rejected</td><td>Finance</td><td>Record the approver's decision</td></tr>
+<tr><td>Approved</td><td>Payment pending</td><td>—</td><td>Immediately</td></tr>
+<tr><td>Payment pending</td><td>Paid</td><td>Finance</td><td>Payment reference and date</td></tr>
+</tbody></table></div>
+<script>
+const pipe=document.getElementById('pipe'),svg=document.getElementById('svg')
+const R=id=>{const a=document.getElementById(id).getBoundingClientRect(),p=pipe.getBoundingClientRect();return{l:a.left-p.left,r:a.right-p.left,t:a.top-p.top,b:a.bottom-p.top,cx:(a.left+a.right)/2-p.left,cy:(a.top+a.bottom)/2-p.top}}
+const path=(d,back)=>{const e=document.createElementNS('http://www.w3.org/2000/svg','path');e.setAttribute('d',d);e.setAttribute('fill','none');e.setAttribute('stroke',back?'#FA6140':'#839D8D');e.setAttribute('stroke-width','2');if(back)e.setAttribute('stroke-dasharray','6 5');e.setAttribute('marker-end',`url(#${back?'b':'a'})`);svg.appendChild(e)}
+const label=(x,y,t,back)=>{const e=document.createElementNS('http://www.w3.org/2000/svg','text');e.setAttribute('x',x);e.setAttribute('y',y);e.setAttribute('text-anchor','middle');e.setAttribute('font-size','12');e.setAttribute('fill',back?'#FA6140':'#7A8684');e.textContent=t;svg.appendChild(e)}
+const fwd=(a,b)=>{const A=R(a),B=R(b);path(`M${A.r+2} ${A.cy} C ${A.r+16} ${A.cy}, ${B.l-16} ${B.cy}, ${B.l-4} ${B.cy}`)}
+const down=(a,b,t)=>{const A=R(a),B=R(b);path(`M${A.cx} ${A.b+2} L ${B.cx} ${B.t-4}`);if(t)label(A.cx+40,(A.b+B.t)/2+4,t)}
+function draw(){svg.querySelectorAll('path,text').forEach(n=>n.remove())
+ fwd('reading','match');down('reading','failed','fails')
+ {const A=R('failed'),B=R('reading');path(`M${A.l-2} ${A.cy} C ${A.l-22} ${A.cy}, ${B.l-22} ${B.cy}, ${B.l-4} ${B.cy}`,1);label(A.l-34,(A.cy+B.cy)/2+4,'retry',1)}
+ fwd('match','review');fwd('review','verify');down('verify','await');fwd('await','approved')
+ {const A=R('await'),B=R('rejected');path(`M${A.r+2} ${A.cy+8} C ${A.r+16} ${A.cy+8}, ${B.l-16} ${B.cy}, ${B.l-4} ${B.cy}`)}
+ fwd('approved','ppend');down('ppend','paid')
+ // returns: review → fix, fix → review, verify → fix
+ {const A=R('review'),B=R('fix');path(`M${A.cx-30} ${A.b+2} L ${B.cx-30} ${B.t-4}`,1);path(`M${B.cx+30} ${B.t-2} L ${A.cx+30} ${A.b+4}`);label(B.cx-62,(A.b+B.t)/2+4,'return',1);label(B.cx+62,(A.b+B.t)/2+4,'resubmit')}
+ {const A=R('verify'),B=R('fix'),y=Math.max(R('fix').b,R('await').b,R('rejected').b)+50;path(`M${A.cx} ${R('await').b+2} L ${A.cx} ${y} L ${B.cx} ${y} L ${B.cx} ${B.b+4}`,1);label((A.cx+B.cx)/2,y-8,'Finance returns with a reason',1)}
+}
+addEventListener('load',draw);addEventListener('resize',draw)
+</script></body></html>

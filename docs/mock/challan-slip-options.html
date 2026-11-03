@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Challan slip card</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EFF5F2;--white:#fff;--text:#44544A;--quiet:#7A8684;--line:#DAE7DF;--outline:#C3CEC7;--green:#37BD69;--gdark:#006D35;--tint:#E8F4F2;--onbg:#E1F9ED;--ink:#1F515B;--red:#E93353;--tert:#FA6140;--notes:#FCF4AE;--amber:#B26A00}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,sans-serif;color:var(--text);padding:32px}
+h1{font-size:24px;font-weight:600;margin:0 0 6px}.lead{margin:0 0 28px;color:var(--quiet);font-size:14px;max-width:900px}
+.opt{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px}.opt h2{font-size:18px;font-weight:600;margin:0 0 4px}.why{font-size:14px;color:var(--quiet);margin:0 0 20px;max-width:900px}
+.sec-h{display:flex;align-items:center;font-size:18px;font-weight:600;margin:0 0 16px}.sec-h .b{margin-left:auto;height:40px;padding:0 16px;border:1px solid var(--outline);border-radius:8px;display:flex;align-items:center;gap:6px;color:var(--green);font-size:14px;font-weight:500;text-transform:uppercase;letter-spacing:.4px}
+.grid{display:grid;gap:12px}.g3{grid-template-columns:repeat(auto-fill,minmax(380px,1fr))}.g4{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;transition:border-color .15s,box-shadow .15s;position:relative}
+.card:hover,.card.hover{border-color:var(--outline);box-shadow:0 4px 14px rgba(31,81,91,.08)}
+.ic{width:32px;height:32px;display:inline-grid;place-items:center;border-radius:8px;color:var(--quiet)}.ic:hover{background:rgba(0,0,0,.05)}
+.no{font-size:16px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub{font-size:13px;color:var(--quiet);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:12px;font-size:12px;font-weight:600;white-space:nowrap}
+.ok{background:var(--tint);color:var(--gdark)}.warn{background:#FFBDA833;color:var(--tert)}.chk{background:var(--notes);color:var(--amber)}.bad{background:#FFD3D3;color:var(--red)}.q{background:rgba(0,0,0,.05);color:var(--text)}
+.lines{font-size:14px;display:flex;flex-direction:column}.lines div{display:flex;justify-content:space-between;gap:12px;padding:4px 0}.lines div span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qty{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--text)}.more{font-size:13px;color:var(--quiet)}
+.paper{background:#ECE7DA;display:flex;align-items:flex-start;justify-content:center;overflow:hidden;position:relative}
+.paper svg{display:block;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.open{position:absolute;right:6px;bottom:6px;height:22px;padding:0 8px;border-radius:11px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;opacity:0;transition:opacity .15s}.card:hover .open,.card.hover .open{opacity:1}
+/* D1 */
+.d1{display:grid;grid-template-columns:112px minmax(0,1fr);overflow:hidden;min-height:176px}.d1 .paper{border-right:1px solid var(--line);padding:12px 0 0}
+.d1 .bd{padding:12px 8px 12px 16px;display:flex;flex-direction:column;gap:6px}.d1 .ft{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:8px;border-top:1px solid var(--line);padding-right:8px}
+/* D2 */
+.d2{overflow:hidden;display:flex;flex-direction:column}.d2 .paper{height:132px;padding-top:12px;border-bottom:1px solid var(--line)}.d2 .bd{padding:12px 8px 12px 14px;display:flex;flex-direction:column;gap:4px}
+/* D3 */
+.d3wrap{display:flex;flex-direction:column;gap:8px}.d3{display:grid;grid-template-columns:64px 220px minmax(0,1fr) auto auto;align-items:center;gap:16px;padding:8px 8px 8px 8px;overflow:hidden}.d3 .paper{width:64px;height:76px;border-radius:6px;padding-top:6px}
+.d3 .items{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.d3 .items b{font-weight:400;color:var(--quiet)}
+.state-l{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--quiet);margin-bottom:8px}
+.held{opacity:.6}
+.addtile{border:1px dashed var(--outline);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--green);font-size:14px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;min-height:176px}
+</style></head><body>
+<h1>Challan slip card</h1>
+<p class="lead">Option D from the card mockup, worked into product UI. The paper is a true miniature of the delivery challan, drawn from the record: vendor, number, date, the item lines and the signed stamp. Hover a card to see the Open hint.</p>
+<div id="root"></div>
+<script>
+const V={'ND':'Nandini Dairy','GVF':'Green Valley Farms','SLA':'Sri Lakshmi Agro Foods'}
+const DCS=[
+ {no:'ND-1013',v:'ND',date:'14 Oct 26',area:'Central Store',by:'Lakshmi Menon',signed:true,items:[['Milk toned 1 ltr','50 ltr'],['Egg (table, white) tray','10 trays']]},
+ {no:'GVF-3303',v:'GVF',date:'15 Oct 26',area:'Rescue Kitchen',by:'Anand Rao',signed:true,ai:true,items:[['Cucumber','45 kg'],['Beetroot','15 kg'],['Lettuce iceberg','60 kg'],['Carrot ooty','60 kg']]},
+ {no:'SLA/2610/3818',v:'SLA',date:'14 Oct 26',area:'Rescue Kitchen',by:'Anand Rao',signed:true,rej:'2 kg rejected',items:[['Pumpkin yellow','15 kg'],['Watermelon kiran','40 kg']]}]
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+// a miniature challan: drawn at 300 wide, shown at w px
+const paper=(d,w)=>{const h=Math.round(w*1.35),rows=d.items.slice(0,5)
+ return `<svg width="${w}" height="${h}" viewBox="0 0 300 405" font-family="Courier New,monospace" fill="#2b2b2b"><rect width="300" height="405" fill="#FBF8F0"/><text x="18" y="34" font-size="17" font-weight="700">${esc(V[d.v])}</text><text x="18" y="52" font-size="10" fill="#666">Bengaluru · GSTIN 29AAB…</text><text x="282" y="80" font-size="12" font-weight="700" text-anchor="end">DELIVERY CHALLAN</text><text x="282" y="97" font-size="10" text-anchor="end">No. ${esc(d.no)}</text><text x="282" y="111" font-size="10" text-anchor="end">${d.date}</text><line x1="18" y1="128" x2="282" y2="128" stroke="#2b2b2b"/><text x="18" y="144" font-size="10" font-weight="700">ITEM</text><text x="282" y="144" font-size="10" font-weight="700" text-anchor="end">QTY</text>${rows.map((r,i)=>`<text x="18" y="${166+i*20}" font-size="11">${esc(r[0].slice(0,24))}</text><text x="282" y="${166+i*20}" font-size="11" text-anchor="end">${esc(r[1])}</text>`).join('')}<line x1="18" y1="${176+rows.length*20}" x2="282" y2="${176+rows.length*20}" stroke="#bbb" stroke-dasharray="3 3"/><text x="18" y="378" font-size="9" fill="#777">Received by ____________</text>${d.signed?`<g transform="translate(220 330) rotate(-12)" fill="none" stroke="#188554"><circle r="34" stroke-width="3"/><circle r="27" stroke-width="1"/><text text-anchor="middle" y="4" font-size="11" font-weight="700" fill="#188554" stroke="none">RECEIVED</text></g>`:''}</svg>`}
+const truck='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="6" width="13" height="10" rx="1.5"/><path d="M14 9h4l3 3v4h-7z"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>'
+const eye='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'
+const x='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+const robot='<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a2 2 0 0 1 1 3.7V7h4a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3h4V5.7A2 2 0 0 1 12 2zM9 12a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>'
+const acts=`<span class="ic" title="View goods receipt">${eye}</span><span class="ic" title="Remove">${x}</span>`
+const tags=d=>[d.ai&&`<span class="pill ok">${robot}On the bill</span>`,d.rej&&`<span class="pill warn">${d.rej}</span>`,d.unsigned&&`<span class="pill chk">Not signed</span>`,d.held&&`<span class="pill q">On BD-26-0007</span>`].filter(Boolean).join('')
+const lines=(d,n=3)=>`<div class="lines">${d.items.slice(0,n).map(i=>`<div><span>${i[0]}</span><span class="qty">${i[1]}</span></div>`).join('')}${d.items.length>n?`<div class="more">+${d.items.length-n} more</div>`:''}</div>`
+const D1=(d,cls='')=>`<div class="card d1 ${cls}"><div class="paper">${paper(d,88)}<span class="open">Open</span></div><div class="bd"><div style="display:flex;align-items:flex-start;gap:4px"><div style="flex:1;min-width:0"><div class="no">${d.no}</div><div class="sub">${d.date} · ${d.area}</div></div>${acts}</div>${lines(d)}<div class="ft"><span class="sub" style="flex:1">${d.items.length} items · ${d.by}</span>${tags(d)}</div></div></div>`
+const D2=d=>`<div class="card d2"><div class="paper">${paper(d,104)}<span class="open">Open</span></div><div class="bd"><div style="display:flex;align-items:flex-start;gap:2px"><div style="flex:1;min-width:0"><div class="no" style="font-size:15px">${d.no}</div><div class="sub">${d.date} · ${d.area}</div></div>${acts}</div><div class="sub" style="color:var(--text)">${d.items.map(i=>i[0]).join(', ')}</div><div style="display:flex;gap:6px;margin-top:6px;min-height:24px">${tags(d)||`<span class="sub">${d.items.length} items</span>`}</div></div></div>`
+const D3=d=>`<div class="card d3"><div class="paper">${paper(d,52)}</div><div style="min-width:0"><div class="no">${d.no}</div><div class="sub">${d.date} · ${d.area}</div></div><div class="items">${d.items.map(i=>`${i[0]} <b>${i[1]}</b>`).join(' · ')}</div><div style="display:flex;gap:6px">${tags(d)}</div><div style="display:flex">${acts}</div></div>`
+const head='<div class="sec-h">2. Challans<span class="b">＋ Add challans</span></div>'
+const add=`<div class="addtile"><span style="font-size:24px;line-height:1">＋</span>Add challans</div>`
+const O=[
+ {t:'D1 · Slip, paper on the left',w:'The paper sits on the left at a readable size, items with quantities on the right, and the receiver and tags in the footer. An add tile closes the grid. Recommended: it reads as a document and still shows the numbers the clerk matches.',r:()=>head+`<div class="grid g3">${DCS.map(d=>D1(d)).join('')}${add}</div>`},
+ {t:'D2 · Document tile, paper on top',w:'Like a file gallery: the top of the paper as a preview, then number, date and area, items as a line, tags. Four per row, so many challans fit, but no quantities on the card.',r:()=>head+`<div class="grid g4">${DCS.map(D2).join('')}</div>`},
+ {t:'D3 · Slip row',w:'A full-width row with a small paper thumbnail, number, items with quantities in one line, tags and actions. Best when a bill covers ten or more challans.',r:()=>head+`<div class="d3wrap">${DCS.map(D3).join('')}</div>`},
+ {t:'D1 in every state',w:'The same card as the clerk meets it: read by Antz AI, with rejected quantity, signed DC missing, hovered, and held by another invoice (greyed, with the invoice it sits on).',
+  r:()=>{const S=[['Read by Antz AI',DCS[1],''],['Rejected quantity',DCS[2],''],['Signed DC missing',{...DCS[0],no:'ND-1019',signed:false,unsigned:true},''],['Hover',DCS[0],'hover'],['Held by another invoice',{...DCS[0],no:'ND-1021',held:true},'held']]
+   return `<div class="grid g3">${S.map(([l,d,c])=>`<div><div class="state-l">${l}</div>${D1(d,c)}</div>`).join('')}</div>`}}]
+document.getElementById('root').innerHTML=O.map(o=>`<div class="opt"><h2>${o.t}</h2><p class="why">${o.w}</p>${o.r()}</div>`).join('')
+</script></body></html>

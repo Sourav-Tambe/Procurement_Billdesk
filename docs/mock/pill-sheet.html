@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bill Desk pills</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EFF5F2;--text:#44544A;--quiet:#7A8684;--line:#DAE7DF;--ink:#1F415B}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,sans-serif;color:var(--text);padding:32px}
+h1{font-size:24px;font-weight:600;margin:0 0 6px}.lead{margin:0 0 24px;color:var(--quiet);font-size:14px;max-width:900px}
+.card{background:#fff;border-radius:12px;padding:24px;margin-bottom:20px;max-width:1240px}.card h2{font-size:18px;font-weight:600;margin:0 0 4px}.card .why{font-size:14px;color:var(--quiet);margin:0 0 18px}
+.pill{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:12px;font-size:12px;font-weight:600;white-space:nowrap}
+.ok{background:#E8F4F2;color:#006D35}.warn{background:#FFBDA833;color:#FA6140}.bad{background:#FFD3D3;color:#E93353}.check{background:#FCF4AE;color:#B26A00}.info{background:#dff9f7;color:#1F415B}.quiet{background:rgba(0,0,0,.05);color:#44544A}
+.sweep{background-image:linear-gradient(100deg,rgba(0,0,0,.05) 30%,rgba(255,255,255,.85) 50%,rgba(0,0,0,.05) 70%);background-size:250% 100%;animation:sw 1.6s ease-in-out infinite}
+@keyframes sw{0%{background-position:100% 0}100%{background-position:-150% 0}}
+@media (prefers-reduced-motion:reduce){.sweep{animation:none}}
+table{width:100%;border-collapse:collapse;font-size:14px}th{text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--quiet);padding:0 12px 10px 0;border-bottom:1px solid var(--line)}
+td{padding:12px 12px 12px 0;border-bottom:1px solid var(--line);vertical-align:middle}tr:last-child td{border-bottom:0}
+code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:rgba(0,0,0,.04);padding:2px 6px;border-radius:4px}
+.anat{display:flex;align-items:center;gap:40px;flex-wrap:wrap}.big{transform:scale(2.2);transform-origin:left center;margin-right:150px}
+.spec{display:grid;grid-template-columns:repeat(4,auto);gap:6px 28px;font-size:14px}.spec b{font-weight:600}
+.sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px;border:1px solid rgba(0,0,0,.08)}
+.q{color:var(--quiet);font-size:13px}.issue{color:#FA6140;font-weight:600}
+</style></head><body>
+<h1>Bill Desk pills</h1>
+<p class="lead">One pill component in six tones, all Antz theme tokens. This sheet lists every pill in Bill Desk, the agreed invoice statuses with the tone each should take, and where the code disagrees today.</p>
+<div id="root"></div>
+<script>
+const R=`<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a2 2 0 0 1 1 3.7V7h4a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3h4V5.7A2 2 0 0 1 12 2zM9 12a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>`
+const CHK=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12.5l4.5 4.5L19 7"/></svg>`
+const ALR=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>`
+const P=(tone,label,icon='',cls='')=>`<span class="pill ${tone} ${cls}">${icon}${label}</span>`
+const TONES=[['ok','Done, matched, good','customColors.tint / #E8F4F2','primary OnSurface / #006D35'],['warn','Discrepancy, sent back','Tertiary @ 20% / #FFBDA833','Tertiary / #FA6140'],['bad','Failed, rejected, missing','ErrorContainer / #FFD3D3','Error / #E93353'],['check','Needs a look, waiting on a decision','Notes / #FCF4AE','amberReduced / #B26A00'],['info','With someone else, in progress','antzSecondaryBg / #dff9f7','OnSecondaryContainer / #1F415B'],['quiet','Neutral, not started, in review','neutral05 / rgba(0,0,0,.05)','OnSurfaceVariant / #44544A']]
+const sec=(t,w,body)=>`<div class="card"><h2>${t}</h2>${w?`<p class="why">${w}</p>`:''}${body}</div>`
+const tbl=(cols,rows)=>`<table><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`
+const html=[
+ sec('Anatomy','The `Pill` in ui/parts.js. One size everywhere.',`<div class="anat"><span class="big">${P('ok','Matched',CHK)}</span><div class="spec"><b>Height</b><span>24px</span><b>Radius</b><span>12px</span><b>Padding</b><span>0 10px</span><b>Gap</b><span>4px</span><b>Text</b><span>12px / 600 (subTitle)</span><b>Icon</b><span>14px, optional, leading</span><b>Wrap</b><span>never</span><b>Hover</b><span>title attribute for the reason</span></div></div>`),
+ sec('Tones','Six tones. Pick by meaning, not by colour.',tbl(['Tone','Pill','Means','Background','Text'],TONES.map(([k,m,bg,fg])=>[`<code>${k}</code>`,P(k,k[0].toUpperCase()+k.slice(1)),m,`<span class="sw" style="background:${bg.split(' / ')[1]}"></span>${bg}`,`<span class="sw" style="background:${fg.split(' / ')[1]}"></span>${fg}`]))),
+ sec('Parsing status','Pending match list and the invoice page title. Robot icon on all four. Reading has a light sweep moving across it, stopped under reduced motion.',tbl(['Status','Pill','Tone','When'],[
+   ['Reading',P('quiet','Reading',R,'sweep'),'quiet + sweep','Antz AI is reading the bill'],['Read',P('ok','Read',R),'ok','Every line read surely'],['Needs check',P('check','Needs check',R),'check','Some values or items uncertain'],['Failed',P('bad','Failed',R),'bad','Could not read; reason on hover']])),
+ sec('Invoice status — agreed pipeline','The eleven statuses from the pipeline mockup, with the tone each should take. Not built yet: the app still runs the older statuses.',tbl(['Stage','Status','Pill','Tone','Who acts'],[
+   ['Read','Reading',P('quiet','Reading',R,'sweep'),'quiet + sweep','Antz AI'],['Read','Read failed',P('bad','Read failed',R),'bad','Clerk'],
+   ['Match','Pending match',P('check','Pending match'),'check','Clerk'],['Review','Under review',P('quiet','Under review'),'quiet','Head'],
+   ['Review','Correction needed',P('warn','Correction needed',ALR),'warn','Clerk or head'],['Verify','In verification',P('info','In verification'),'info','Finance'],
+   ['Decision','Awaiting approval',P('check','Awaiting approval'),'check','Approver'],['Decision','Approved',P('ok','Approved',CHK),'ok','—'],
+   ['Decision','Rejected',P('bad','Rejected'),'bad','Open (BD-8)'],['Payment','Payment pending',P('ok','Payment pending'),'ok','Finance'],['Payment','Paid',P('ok','Paid',CHK),'ok','—']])),
+ sec('Match','Beside the status, never instead of it.',tbl(['State','Pill','Tone','Note'],[
+   ['Matched',P('ok','Matched',CHK),'ok','Billed equals received on every line'],['With discrepancies',P('warn','With discrepancies',ALR),'warn','In lists, plain orange text “n items mismatch” instead of a pill'],
+   ['Resolved by head',P('info','Pay as received',ALR),'info','After the head chooses Pay as received or Accept as billed']])),
+ sec('Challan and others','',tbl(['Where','Pill','Tone'],[
+   ['Goods receipt header, challan to bill',P('quiet','To bill'),'quiet'],['Add challans sheet, Antz AI hint',P('ok','2 of 3',R),'ok'],
+   ['Add challans sheet, challan on another invoice',P('warn','With discrepancies',ALR),'warn (state of that invoice)'],
+   ['Matched list, invoice without a bill',P('bad','No vendor bill'),'bad'],['Compare panel, unpaired line',P('check','Not paired'),'check']])),
+ sec('Where the code disagrees today','To fix when the new statuses are built.',tbl(['','Issue','Fix'],[
+   ['<span class="issue">1</span>','“To bill” is <code>quiet</code> in the challan list but <code>ok</code> in the goods receipt header','Use quiet everywhere'],
+   ['<span class="issue">2</span>','Old statuses use <code>info</code> for both “With head” and “With Finance”','Under review quiet, In verification info, as above'],
+   ['<span class="issue">3</span>','“Waiting for Finance” and “Returned by head” use <code>warn</code>, the discrepancy tone','Waiting is not a problem: check. Returned becomes Correction needed, warn'],
+   ['<span class="issue">4</span>','Discrepancy pill reads “Discrepancy · 2” in some places and “With discrepancies” in others','“With discrepancies” on pages, “n items mismatch” text in lists']]))
+]
+document.getElementById('root').innerHTML=html.join('')
+</script></body></html>

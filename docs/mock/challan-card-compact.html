@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Compact challan card</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EFF5F2;--text:#44544A;--quiet:#7A8684;--line:#DAE7DF;--outline:#C3CEC7;--green:#37BD69;--gdark:#006D35;--onbg:#E1F9ED;--outl:#839D8D}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,sans-serif;color:var(--text);padding:32px}
+h1{font-size:24px;font-weight:600;margin:0 0 6px}.lead{margin:0 0 28px;color:var(--quiet);font-size:14px;max-width:900px}
+.opt{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;max-width:1240px}.opt h2{font-size:18px;font-weight:600;margin:0 0 4px}.why{font-size:14px;color:var(--quiet);margin:0 0 18px;max-width:900px}
+.rec{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:2px 10px;border-radius:10px;margin-left:8px;vertical-align:middle}
+.sec{display:flex;align-items:center;font-size:20px;font-weight:600;margin-bottom:16px}.sec .b{margin-left:auto;color:var(--green);font-size:14px;font-weight:500;text-transform:uppercase;letter-spacing:.4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;transition:border-color .15s}.card:hover{border-color:var(--outl)}
+.no{font-size:16px;font-weight:600;color:var(--text);line-height:1.4}.m{font-size:14px;color:var(--quiet)}.v{font-size:14px;color:var(--text)}
+.acts{display:flex;gap:4px;color:var(--quiet)}.acts span{width:32px;height:32px;display:grid;place-items:center;border-radius:8px}
+.tile{width:48px;height:48px;border-radius:10px;background:var(--onbg);display:grid;place-items:center;flex:none}
+.doc{width:44px;height:56px;border-radius:4px;background:#fff;border:1px solid var(--outline);position:relative;flex:none;display:flex;flex-direction:column;gap:4px;padding:8px 7px}.doc i{display:block;height:3px;border-radius:2px;background:var(--line)}.doc .fold{position:absolute;top:-1px;right:-1px;width:12px;height:12px;background:linear-gradient(225deg,var(--bg) 50%,var(--outline) 50%)}
+.items{display:flex;flex-direction:column;gap:4px;font-size:14px}.items div{display:flex;justify-content:space-between}.items span:last-child{color:var(--quiet)}
+.hr{border-top:1px solid var(--line)}
+</style></head><body>
+<h1>Challan card without items or the paper picture</h1>
+<p class="lead">Option 0 is today's card. Options A to C drop the item lines and the paper thumbnail and put a challan icon in its place. The items already show in section 3, and the eye opens the full goods receipt.</p>
+<div id="root"></div>
+<script>
+const truck='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#006D35" stroke-width="1.7"><rect x="1" y="6" width="13" height="10" rx="1.5"/><path d="M14 9h4l3 3v4h-7z"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/><path d="M4.5 11l2 2 4-4"/></svg>'
+const challan='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#006D35" stroke-width="1.7"><path d="M6 2h9l4 4v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M15 2v4h4M8 10h8M8 13.5h8M8 17h5"/></svg>'
+const eye='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>'
+const x='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+const acts=`<div class="acts"><span>${eye}</span><span>${x}</span></div>`
+const D=[{no:'GVF-3287',n:2,area:'Rescue Kitchen',date:'4 Oct 26',by:'Anand Rao',it:[['Sweet potato','30 kg'],['Lettuce iceberg','30 kg']]},{no:'GVF-3294',n:1,area:'Rescue Kitchen',date:'9 Oct 26',by:'Anand Rao',it:[['Sweet potato','15 kg']]},{no:'GVF-3303',n:4,area:'Rescue Kitchen',date:'15 Oct 26',by:'Anand Rao',it:[['CUCUMBER','45 kg'],['Beetroot','15 kg']]}]
+const paper='<div style="width:76px;height:100px;background:#F4F1E8;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.1);padding:8px 6px;display:flex;flex-direction:column;gap:4px"><i style="display:block;height:4px;width:70%;background:#C9C2AE"></i><i style="display:block;height:3px;background:#DDD6C4"></i><i style="display:block;height:3px;width:80%;background:#DDD6C4"></i><i style="display:block;height:3px;background:#DDD6C4"></i></div>'
+const O=[
+ {t:'0 · Today',w:'Paper thumbnail, two item lines and a reserved third row, then date and receiver. 196px tall, mostly to repeat what section 3 shows.',
+  c:d=>`<div class="card" style="display:grid;grid-template-columns:104px 1fr;min-height:196px;overflow:hidden"><div style="background:var(--bg);display:grid;place-items:center;border-right:1px solid var(--line)">${paper}</div><div style="padding:12px 8px 12px 16px;display:flex;flex-direction:column"><div style="display:flex"><div style="flex:1"><div class="no">${d.no}</div><div class="m">${d.n} items · ${d.area}</div></div>${acts}</div><div class="items" style="margin:8px 8px 12px 0;min-height:52px">${d.it.map(i=>`<div><span>${i[0]}</span><span>${i[1]}</span></div>`).join('')}${d.n>2?`<div class="m">+${d.n-2} more</div>`:''}</div><div class="hr m" style="margin-top:auto;padding-top:8px;margin-right:8px">${d.date} · ${d.by}</div></div></div>`},
+ {t:'A · Icon tile, two lines',rec:1,w:'A 48px challan tile, the number, then "n items · area" and "date · receiver" on two quiet lines. About 96px tall, so a bill with six challans fits in two rows.',
+  c:d=>`<div class="card" style="display:flex;align-items:center;gap:16px;padding:16px 8px 16px 16px"><div class="tile">${challan}</div><div style="flex:1;min-width:0"><div class="no">${d.no}</div><div class="m">${d.n} ${d.n===1?'item':'items'} · ${d.area}</div><div class="m">${d.date} · ${d.by}</div></div>${acts}</div>`},
+ {t:'B · Document placeholder',w:'The paper keeps its place as a drawn page outline with a folded corner, so it still reads as a document, without a picture of it. Same two lines of facts.',
+  c:d=>`<div class="card" style="display:flex;align-items:center;gap:16px;padding:14px 8px 14px 16px"><div class="doc"><span class="fold"></span><i style="width:70%"></i><i></i><i style="width:80%"></i><i></i><i style="width:55%"></i></div><div style="flex:1;min-width:0"><div class="no">${d.no}</div><div class="m">${d.n} ${d.n===1?'item':'items'} · ${d.area}</div><div class="m">${d.date} · ${d.by}</div></div>${acts}</div>`},
+ {t:'C · Single line',w:'Truck icon, number and facts on one line, at the height of a table row. The most compact, but the facts truncate on a narrow card, so it suits a full-width list rather than the grid.',
+  c:d=>`<div class="card" style="display:flex;align-items:center;gap:14px;padding:10px 8px 10px 12px"><div class="tile" style="width:40px;height:40px;border-radius:8px">${truck}</div><div class="no" style="min-width:110px">${d.no}</div><div class="m" style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.n} ${d.n===1?'item':'items'} · ${d.date} · ${d.by}</div>${acts}</div>`,list:1}]
+document.getElementById('root').innerHTML=O.map(o=>`<div class="opt"><h2>${o.t}${o.rec?'<span class="rec">Recommended</span>':''}</h2><p class="why">${o.w}</p><div class="sec">2. Challans<span class="b">＋ Add challans</span></div><div class="${o.list?'':'grid'}" style="${o.list?'display:flex;flex-direction:column;gap:8px':''}">${D.map(o.c).join('')}</div></div>`).join('')
+</script></body></html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Attachments options</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EFF5F2;--white:#fff;--text:#44544A;--quiet:#7A8684;--line:#DAE7DF;--outline:#C3CEC7;--green:#37BD69;--gdark:#006D35;--tint:#E1F9ED;--ink:#1F515B;--n05:rgba(0,0,0,.05);--red:#E93353}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,sans-serif;color:var(--text);padding:32px}
+h1{font-size:24px;font-weight:600;margin:0 0 6px}p.lead{margin:0 0 28px;color:var(--quiet);font-size:14px}
+.opt{background:var(--white);border-radius:12px;padding:24px;margin-bottom:24px}
+.opt h2{font-size:18px;font-weight:600;margin:0 0 4px}.opt .why{font-size:14px;color:var(--quiet);margin:0 0 18px}
+.states{display:grid;grid-template-columns:1fr 1fr;gap:24px}.state-l{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--quiet);margin-bottom:8px}
+.sec{border:1px solid var(--line);border-radius:12px;padding:16px}.sec h3{font-size:16px;font-weight:600;margin:0 0 14px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
+.fields{display:flex;flex-direction:column;gap:14px}
+.f{position:relative;height:48px;border:1px solid var(--outline);border-radius:8px;padding:0 12px;display:flex;align-items:center;font-size:14px;color:var(--text)}
+.f label{position:absolute;top:-8px;left:9px;background:#fff;padding:0 4px;font-size:11px;color:var(--quiet)}.f.ph{color:var(--quiet)}
+.thumb{border-radius:8px;border:1px solid var(--line);position:relative;flex:none;background-size:cover;background-position:top}
+.x{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:12px;display:grid;place-items:center}
+.add{border:1px dashed var(--outline);border-radius:8px;display:grid;place-items:center;color:var(--green);font-size:22px;flex:none}
+.cap{font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row{display:flex;align-items:center;gap:10px;height:52px;padding:0 10px;border:1px solid var(--line);border-radius:8px}
+.row .nm{flex:1;min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.row .sz{font-size:12px;color:var(--quiet)}
+.ic{width:20px;height:20px;color:var(--quiet);font-size:15px;display:grid;place-items:center}.ic.del{color:var(--red)}
+.btn{height:40px;border:1px dashed var(--outline);border-radius:8px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--green);font-size:14px;font-weight:500;text-transform:uppercase;letter-spacing:.4px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 6px 0 4px;border-radius:6px;background:var(--bg);font-size:12px;color:var(--text);max-width:200px}
+.chip i{width:22px;height:22px;border-radius:4px;background-size:cover;flex:none}.chip span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pick{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--tint);color:var(--gdark);display:inline-block;margin-left:8px;vertical-align:middle}
+</style></head><body>
+<h1>Attachments in “1. Invoice details”</h1>
+<p class="lead">Four ways to stop the attachments box from sitting half empty. Each option shows one file and four files. The fields on the right stay as they are.</p>
+<div id="root"></div>
+<script>
+const P=['linear-gradient(160deg,#FBFAF6 0 60%,#E8E2D3 60%)','linear-gradient(160deg,#F4F1E8 0 55%,#DCD3BC 55%)','linear-gradient(160deg,#EEF5FF 0 50%,#C9DCF2 50%)','linear-gradient(160deg,#F7F2FF 0 60%,#DCCCF2 60%)']
+const N=['GVF-2610-061.pdf','Invoice page 2.jpg','E-way bill.png','Signed DC.jpg']
+const fields=`<div class="fields"><div class="f"><label>Invoice number*</label>GVF/2610/061</div><div class="f"><label>Vendor*</label>Green Valley Farms</div><div class="f"><label>Invoice date*</label>15/10/2026</div></div>`
+const sec=(body,title='1. Invoice details')=>`<div class="sec"><h3>${title}</h3>${body}</div>`
+const files=n=>N.slice(0,n).map((nm,i)=>({nm,bg:P[i]}))
+const opts=[
+ {t:'A · File rows, like the compliance upload',w:'Each file is one 52px row with a small thumbnail, name, size, view and remove. Upload sits under the rows. The column holds 3 rows before it scrolls.',
+  r:n=>sec(`<div class="split"><div style="display:flex;flex-direction:column;gap:8px">${files(n).map(f=>`<div class="row"><div class="thumb" style="width:32px;height:32px;background:${f.bg}"></div><div class="nm">${f.nm}<div class="sz">240 KB</div></div><span class="ic">◉</span><span class="ic del">✕</span></div>`).join('')}<div class="btn">＋ Upload file</div></div>${fields}</div>`)},
+ {t:'B · Fields on one row, attachments as a strip below',w:'Number, vendor and date share one row. The attachments become a single row of small tiles under them, so there is no box to fill. Recommended.',
+  r:n=>sec(`<div style="display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:14px;margin-bottom:16px"><div class="f"><label>Invoice number*</label>GVF/2610/061</div><div class="f"><label>Vendor*</label>Green Valley Farms</div><div class="f"><label>Invoice date*</label>15/10/2026</div></div><div class="state-l" style="margin-bottom:8px">Attachments · ${n}</div><div style="display:flex;gap:10px;overflow-x:auto">${files(n).map(f=>`<div style="width:72px"><div class="thumb" style="width:72px;height:72px;background:${f.bg}"><span class="x">✕</span></div><div class="cap" style="margin-top:4px">${f.nm}</div></div>`).join('')}<div class="add" style="width:72px;height:72px">＋</div></div>`)},
+ {t:'C · Attachments as a field in the grid',w:'A 2×2 grid. The fourth slot is an Attachments field like the compliance file upload. Files show as chips inside it, and the field grows a line when they wrap.',
+  r:n=>sec(`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="f"><label>Invoice number*</label>GVF/2610/061</div><div class="f"><label>Vendor*</label>Green Valley Farms</div><div class="f"><label>Invoice date*</label>15/10/2026</div><div class="f" style="height:auto;min-height:48px;padding:8px 10px;align-items:flex-start;flex-wrap:wrap;gap:6px"><label>Attachments*</label>${files(n).map(f=>`<span class="chip"><i style="background:${f.bg}"></i><span>${f.nm}</span><b style="color:var(--quiet);font-weight:400">✕</b></span>`).join('')}<span class="chip" style="color:var(--green);background:none;border:1px dashed var(--outline)">＋ Add</span></div></div>`)},
+ {t:'D · Tiles fill the height',w:'The tiles are as tall as the three fields, in paper shape, so one bill reads like a page. More files sit side by side and scroll sideways.',
+  r:n=>sec(`<div class="split"><div style="display:flex;gap:10px;overflow-x:auto;height:172px">${files(n).map(f=>`<div style="width:120px;flex:none;display:flex;flex-direction:column;gap:4px"><div class="thumb" style="width:120px;height:150px;background:${f.bg}"><span class="x">✕</span></div><div class="cap">${f.nm}</div></div>`).join('')}<div class="add" style="width:120px;height:150px">＋</div></div>${fields}</div>`)}
+]
+document.getElementById('root').innerHTML=opts.map(o=>`<div class="opt"><h2>${o.t}</h2><p class="why">${o.w}</p><div class="states"><div><div class="state-l">One file</div>${o.r(1)}</div><div><div class="state-l">Four files</div>${o.r(4)}</div></div></div>`).join('')
+</script></body></html>

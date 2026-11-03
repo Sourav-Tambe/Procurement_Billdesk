@@ -1,0 +1,115 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Add invoice · refinements</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1F415B;--text:#44544A;--quiet:#7A8684;--line:#C3CEC7;--hair:rgba(0,0,0,.08);--mint:#E8F4F2;--head:#E8F4F2;--bg:#EFF5F2;--green:#37BD69;--gdark:#006D35;--tert:#FA6140;--err:#E93353;--n05:rgba(0,0,0,.05);--surf:#F2FFF8;--navy:#1F415B}
+*{box-sizing:border-box}body{margin:0;background:#dfe9e5;font-family:Inter,system-ui,sans-serif;color:var(--ink);font-size:14px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1500px;margin:0 auto;padding:32px 40px 80px}
+h1{font-size:22px;font-weight:600;color:var(--text);margin:0 0 4px}.lead{color:var(--quiet);margin:0 0 32px}
+.tag{display:flex;gap:12px;align-items:baseline;margin:0 0 12px}.tag b{font-size:16px}.tag span{color:var(--quiet);font-size:13px}
+.var{margin-bottom:64px}
+.modal{background:var(--bg);border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.18);overflow:hidden;display:flex;flex-direction:column}
+.mh{height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:#fff;border-bottom:1px solid var(--n05)}
+.mh b{font-size:20px;font-weight:500;color:var(--text)}.x{font-size:22px;color:var(--text)}
+.mb{padding:16px 24px;display:flex;flex-direction:column;gap:16px}
+.card{background:#fff;border-radius:12px;padding:16px}
+.ct{display:flex;align-items:center;gap:8px;margin-bottom:12px}.ct b{font-size:16px;font-weight:600;color:var(--text);flex:1}.ct span{color:var(--quiet);font-size:13px}
+.grid3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px}
+.fld{position:relative;border:1px solid var(--line);border-radius:8px;height:56px;display:flex;align-items:center;padding:0 14px;font-size:16px;color:var(--ink);background:#fff}
+.fld .lb{position:absolute;top:-8px;left:10px;background:#fff;padding:0 4px;font-size:12px;color:var(--quiet)}
+.fld.ph{color:var(--quiet)}.fld .car{margin-left:auto;color:var(--quiet)}
+.help{font-size:12px;color:var(--quiet);margin:4px 14px 0}.help.bad{color:var(--err)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 12px 8px 8px;background:#fff;min-width:230px}
+.chip.on{border-color:var(--gdark);background:var(--surf)}.chip.hold{border-color:rgba(250,97,64,.5);background:rgba(250,97,64,.06)}
+.cb{width:20px;height:20px;border-radius:4px;border:2px solid var(--quiet);flex:none;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700}
+.chip.on .cb{background:var(--green);border-color:var(--green)}.chip.hold .cb{opacity:.3}
+.chip .n{font-weight:600;color:#000}.chip .s{font-size:12px;color:var(--quiet)}.chip .st{margin-left:auto;font-size:12px;font-weight:600}
+.ok{color:var(--gdark)}.miss{color:var(--err)}
+table{width:100%;border-collapse:separate;border-spacing:0}
+th{background:var(--head);color:var(--text);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.17px;text-align:left;padding:0 12px;height:48px;white-space:nowrap}
+th.r,td.r{text-align:right}td{padding:10px 12px;border-top:1px solid var(--hair);vertical-align:middle}
+td .nm{font-weight:500;color:#000;display:block}td .cd{font-size:12px;color:var(--quiet)}td .cd.bad{color:var(--tert)}
+.in{display:inline-flex;align-items:center;justify-content:flex-end;height:40px;width:110px;border:1px solid var(--line);border-radius:8px;padding:0 12px;background:#fff}
+.in.ph{color:var(--quiet)}.in.bad{border-color:var(--tert);background:rgba(250,97,64,.05)}.in.def{color:var(--quiet)}
+tr.disc td{background:rgba(250,97,64,.05)}
+.addl{display:inline-flex;align-items:center;gap:8px;color:var(--gdark);font-weight:600;padding:12px}
+.up{border:1px dashed var(--line);border-radius:8px;height:56px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--green);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.frow{display:flex;align-items:center;gap:8px;height:52px;padding:0 12px;border:1px solid #DAE7DF;border-radius:8px;background:#fff;margin-bottom:8px}.frow .t{margin-left:auto;color:var(--err)}
+.foot{background:#fff;border-top:1px solid var(--n05);padding:14px 24px;display:flex;align-items:center;gap:16px}
+.btn{height:48px;padding:0 20px;border-radius:8px;display:inline-flex;align-items:center;gap:8px;font-weight:600}
+.btn.o{border:1px solid var(--line);background:#fff;color:#000}.btn.p{background:var(--green);color:#fff}.btn.d{background:var(--n05);color:var(--quiet)}
+.pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:13px;font-size:12px;font-weight:600}
+.pill.ok{background:var(--mint)}.pill.warn{background:rgba(250,97,64,.12);color:var(--tert)}.pill.q{background:var(--n05);color:var(--text)}
+.todo{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--quiet)}.todo .x2{color:var(--tert)}
+.sum{display:grid;grid-template-columns:auto auto;gap:6px 24px;align-items:baseline}.sum .k{color:var(--quiet);font-size:13px}.sum .v{text-align:right;font-variant-numeric:tabular-nums}
+.big{font-size:24px;font-weight:600;color:#000}
+.check{display:flex;align-items:center;gap:10px;border-radius:10px;padding:12px 14px}
+.check.good{background:var(--mint);color:var(--gdark)}.check.bad{background:rgba(250,97,64,.1);color:var(--tert)}
+/* B */
+.two{display:grid;grid-template-columns:minmax(0,1fr) 380px;min-height:820px}
+.left{padding:16px 24px;display:flex;flex-direction:column;gap:16px}
+.right{background:#fff;border-left:1px solid var(--n05);display:flex;flex-direction:column}
+.rp{padding:20px;display:flex;flex-direction:column;gap:16px;flex:1}
+.rf{padding:16px 20px;border-top:1px solid var(--n05);display:flex;flex-direction:column;gap:12px;box-shadow:0 -1px 12px rgba(0,0,0,.06)}
+.note{font-size:13px;color:var(--quiet);margin:8px 0 0}
+.box{border-radius:10px;border:1px solid var(--line);padding:14px}
+
+/* Procure Lite request items table (REQ detail): rounded tinted header, sentence-case labels, thumb, hairlines, total row */
+.rt{width:100%;border-collapse:separate;border-spacing:0}
+.rt th{background:#EEF3F1;color:var(--text);font-size:14px;font-weight:500;text-transform:none;letter-spacing:0;height:48px;padding:0 14px}
+.rt th:first-child{border-radius:10px 0 0 10px}.rt th:last-child{border-radius:0 10px 10px 0}
+.rt td{padding:12px 14px;border-top:0;border-bottom:1px solid var(--hair)}
+.rt .it{display:flex;align-items:center;gap:14px}.rt .th{width:48px;height:48px;border-radius:8px;background:#E3ECE8;display:grid;place-items:center;color:var(--quiet);font-size:18px;flex:none}
+.rt .nm{font-size:16px;font-weight:500;color:#000}.rt .cd{font-size:14px;color:var(--quiet)}.rt .cd.bad{color:var(--tert)}
+.rt tr.tot td{border-bottom:0;padding-top:18px}.rt .tl{font-size:16px;color:var(--text)}.rt .tv{font-size:26px;font-weight:500;color:#000}
+/* one container for the whole invoice record */
+.rec{background:#fff;border-radius:12px}
+.rech{display:flex;align-items:center;gap:10px;padding:18px 20px;border-bottom:1px solid var(--hair)}.rech b{font-size:18px;font-weight:600;color:var(--text)}
+.recb{padding:20px;display:flex;flex-direction:column;gap:24px}
+.sub{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;justify-content:space-between}.sub span{font-weight:400;color:var(--quiet)}
+</style></head><body><div class="wrap">
+<h1>Add invoice · refinements</h1>
+<p class="lead">Same invoice in both: Sri Lakshmi Agro Foods, two DCs ticked, one line billed more than received. No printed total, no to-do list. Upload stays a plain attach.</p>
+
+<section class="var"><div class="tag"><b>A · Stacked, one record</b><span>Vendor, DCs, items and documents in one container with one header. Items table as Procure Lite's request items. Footer: total, Cancel, Save.</span></div>
+<div class="modal">
+  <div class="mh"><b>Add invoice</b><span class="x">✕</span></div>
+  <div class="mb"><div class="rec"><div class="rech"><span style="font-size:20px">🧾</span><b>Invoice record</b><span style="margin-left:auto;color:var(--quiet);font-size:13px">Sri Lakshmi Agro Foods · SLA/INV/3812</span></div><div class="recb">
+    <div class="grid3">
+      <div><div class="fld"><span class="lb">Vendor</span>Sri Lakshmi Agro Foods<span class="car">▾</span></div><div class="help">GSTIN 29AAKFS4417M1Z2 · 5 DCs to bill</div></div>
+      <div><div class="fld"><span class="lb">Invoice number</span>SLA/INV/3812</div><div class="help">As printed on the bill</div></div>
+      <div><div class="fld"><span class="lb">Invoice date</span>14/10/2026</div><div class="help">On or after the latest DC</div></div>
+    </div>
+    <div><div class="sub">DCs on this invoice<span>2 of 5 ticked · 125 kg received</span></div><div class="chips"><div class="chip on"><div class="cb">✓</div><div><div class="n">SLA/2610/3797</div><div class="s">10 Oct · 3 items · 85 kg</div></div><div class="st ok">Signed</div></div><div class="chip on"><div class="cb">✓</div><div><div class="n">SLA/2610/3805</div><div class="s">12 Oct · 1 item · 40 kg</div></div><div class="st ok">Signed</div></div><div class="chip "><div class="cb"></div><div><div class="n">SLA/2610/3809</div><div class="s">12 Oct · 1 item · 36 kg</div></div><div class="st miss">Missing</div></div><div class="chip "><div class="cb"></div><div><div class="n">SLA/2610/3818</div><div class="s">14 Oct · 2 items · 55 kg</div></div><div class="st ok">Signed</div></div><div class="chip hold"><div class="cb"></div><div><div class="n">SLA/2610/3823</div><div class="s">On BD-26-0007 · with discrepancies</div></div><div class="st " style="color:var(--tert)">Delete</div></div></div></div>
+    <div><div class="sub">Items · 4<span>Enter what the bill says. GST % fills from the item.</span></div><table class="rt"><tr><th>Item</th><th class="r">Billed qty</th><th class="r">Rate</th><th class="r">GST %</th><th class="r">Amount</th></tr><tr><td><div class="it"><div class="th">🥭</div><div><div class="nm">Mango Alphonso</div><div class="cd">FV-0201 · 30 kg received</div></div></div></td><td class="r"><span class="in" style="width:110px">30</span></td><td class="r"><span class="in">120.00</span></td><td class="r"><span class="in def" style="width:70px">0</span></td><td class="r" style="font-weight:600;">₹3,600</td></tr><tr class=disc><td><div class="it"><div class="th">🌾</div><div><div class="nm">Sugarcane (cut)</div><div class="cd bad">Billed 20 more than received (15 kg)</div></div></div></td><td class="r"><span class="in bad" style="width:110px">35</span></td><td class="r"><span class="in">40.00</span></td><td class="r"><span class="in def" style="width:70px">0</span></td><td class="r" style="font-weight:600;">₹1,400</td></tr><tr><td><div class="it"><div class="th">🍈</div><div><div class="nm">Papaya red lady</div><div class="cd">FV-0118 · 40 kg received</div></div></div></td><td class="r"><span class="in" style="width:110px">40</span></td><td class="r"><span class="in">85.00</span></td><td class="r"><span class="in def" style="width:70px">0</span></td><td class="r" style="font-weight:600;">₹3,400</td></tr><tr><td><div class="it"><div class="th">🍐</div><div><div class="nm">Guava Allahabad</div><div class="cd">FV-0120 · 40 kg received</div></div></div></td><td class="r"><span class="in" style="width:110px">40</span></td><td class="r"><span class="in ph">0.00</span></td><td class="r"><span class="in def" style="width:70px">0</span></td><td class="r" style="font-weight:600;color:var(--quiet)">—</td></tr><tr class="tot"><td><span class="tl">Total</span></td><td colspan="3"></td><td class="r"><span class="tv">₹8,400</span></td></tr></table></div>
+    <div><div class="sub">Documents · 1<span>The invoice and the papers that came with it</span></div><div class="frow">📄 <span>SLA-INV-3812.pdf</span><span style="color:var(--quiet);font-size:12px">1.4 MB</span><span class="t">🗑</span></div><div class="up">📎 Add file</div></div>
+  </div></div></div>
+  <div class="foot"><span style="color:var(--quiet)">Total</span><span class="big">₹8,400</span><span class="pill warn">With discrepancies · 1</span><div style="flex:1"></div><span class="btn o">Cancel</span><span class="btn d">Save invoice</span></div>
+</div></section>
+
+<section class="var"><div class="tag"><b>B · Two panes, one record</b><span>Left: one container with one header holding vendor, DCs and items. Right: invoice number, date, documents, total and Save pinned.</span></div>
+<div class="modal">
+  <div class="mh"><b>Add invoice</b><span class="x">✕</span></div>
+  <div class="two">
+    <div class="left"><div class="rec"><div class="rech"><span style="font-size:20px">🧾</span><b>Invoice record</b><span style="margin-left:auto;color:var(--quiet);font-size:13px">Sri Lakshmi Agro Foods · SLA/INV/3812</span></div><div class="recb">
+      <div><div class="fld"><span class="lb">Vendor</span>Sri Lakshmi Agro Foods<span class="car">▾</span></div><div class="help">GSTIN 29AAKFS4417M1Z2 · 5 DCs to bill</div></div>
+      <div><div class="sub">DCs on this invoice<span>2 of 5 ticked</span></div><div class="chips"><div class="chip on"><div class="cb">✓</div><div><div class="n">SLA/2610/3797</div><div class="s">10 Oct · 85 kg</div></div><div class="st ok">Signed</div></div><div class="chip on"><div class="cb">✓</div><div><div class="n">SLA/2610/3805</div><div class="s">12 Oct · 40 kg</div></div><div class="st ok">Signed</div></div><div class="chip "><div class="cb"></div><div><div class="n">SLA/2610/3809</div><div class="s">12 Oct · 36 kg</div></div><div class="st miss">Missing</div></div><div class="chip "><div class="cb"></div><div><div class="n">SLA/2610/3818</div><div class="s">14 Oct · 55 kg</div></div><div class="st ok">Signed</div></div><div class="chip hold"><div class="cb"></div><div><div class="n">SLA/2610/3823</div><div class="s">On BD-26-0007</div></div><div class="st " style="color:var(--tert)">Delete</div></div></div></div>
+    <div><div class="sub">Items · 4<span>Enter what the bill says</span></div><table class="rt"><tr><th>Item</th><th class="r">Billed qty</th><th class="r">Rate</th><th class="r">GST %</th><th class="r">Amount</th></tr><tr><td><div class="it"><div class="th">🥭</div><div><div class="nm">Mango Alphonso</div><div class="cd">FV-0201 · 30 kg received</div></div></div></td><td class="r"><span class="in" style="width:90px">30</span></td><td class="r"><span class="in">120.00</span></td><td class="r"><span class="in def" style="width:60px">0</span></td><td class="r" style="font-weight:600;">₹3,600</td></tr><tr class=disc><td><div class="it"><div class="th">🌾</div><div><div class="nm">Sugarcane (cut)</div><div class="cd bad">Billed 20 more than received (15 kg)</div></div></div></td><td class="r"><span class="in bad" style="width:90px">35</span></td><td class="r"><span class="in">40.00</span></td><td class="r"><span class="in def" style="width:60px">0</span></td><td class="r" style="font-weight:600;">₹1,400</td></tr><tr><td><div class="it"><div class="th">🍈</div><div><div class="nm">Papaya red lady</div><div class="cd">FV-0118 · 40 kg received</div></div></div></td><td class="r"><span class="in" style="width:90px">40</span></td><td class="r"><span class="in">85.00</span></td><td class="r"><span class="in def" style="width:60px">0</span></td><td class="r" style="font-weight:600;">₹3,400</td></tr><tr><td><div class="it"><div class="th">🍐</div><div><div class="nm">Guava Allahabad</div><div class="cd">FV-0120 · 40 kg received</div></div></div></td><td class="r"><span class="in" style="width:90px">40</span></td><td class="r"><span class="in ph">0.00</span></td><td class="r"><span class="in def" style="width:60px">0</span></td><td class="r" style="font-weight:600;color:var(--quiet)">—</td></tr><tr class="tot"><td><span class="tl">Total</span></td><td colspan="3"></td><td class="r"><span class="tv">₹8,400</span></td></tr></table></div>
+    </div></div></div>
+    <div class="right">
+      <div class="rp">
+        <div style="font-weight:600;color:var(--text);font-size:16px">The bill</div>
+        <div class="fld"><span class="lb">Invoice number</span>SLA/INV/3812</div>
+        <div class="fld"><span class="lb">Invoice date</span>14/10/2026</div>
+        <div><div style="font-weight:600;color:var(--text);font-size:16px;margin-bottom:10px">Documents · 1</div><div class="frow">📄 <span>SLA-INV-3812.pdf</span><span style="color:var(--quiet);font-size:12px">1.4 MB</span><span class="t">🗑</span></div><div class="up">📎 Add file</div></div>
+      </div>
+      <div class="rf">
+        <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="color:var(--text);font-weight:500">Total</span><span class="big">₹8,400</span></div>
+        <div><span class="pill warn">With discrepancies · 1</span></div>
+        <span class="btn d" style="justify-content:center">Save invoice</span>
+      </div>
+    </div>
+  </div>
+</div></section>
+</div></body></html>

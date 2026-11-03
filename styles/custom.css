@@ -1,0 +1,574 @@
+.tablerowi .cellmodule {
+  padding-left: 0 !important;
+}
+.w_280 {
+  width: 280px;
+}
+.text_overflow_moduled {
+  width: 100%;
+  float: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.w_155 {
+  width: 155px;
+}
+.element {
+  border: 3px solid;
+  border-color: #446f54;
+  border-image-slice: 1;
+  border-radius: 15px;
+}
+.diet_val_container {
+  width: 125px;
+}
+.diet_val_cont {
+  width: 125px;
+}
+.diet_cell {
+  width: 121px;
+}
+.diet_gender {
+  width: 121px;
+}
+.cellmodule4 {
+  width: 565px;
+}
+.cell_gend {
+  width: 580px;
+}
+.cell_dimn {
+  width: 580px;
+}
+.diet_weight {
+  width: 155px;
+}
+.recipe_name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 140px;
+}
+.ing_byperc {
+  margin-left: 20px;
+}
+.ing_byquan {
+  margin-left: 12px;
+}
+.meal_dtl_hd {
+  width: 580px;
+}
+.export_dtl_list {
+  width: 45%;
+  padding-right: 10px;
+}
+.other_dtl_list {
+  width: 45%;
+  padding-right: 10px;
+}
+.MuiBox-root:has(.animl_dt) {
+  padding-top: 15px !important;
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .item_cls {
+    margin-right: 25px !important;
+  }
+  .recipe_name {
+    width: 100px;
+  }
+  .edit_contxt {
+    gap: 400px !important;
+  }
+  .editanimals_contxt {
+    gap: 450px !important;
+  }
+  .pencil_diet {
+    position: absolute !important;
+    right: 11% !important;
+  }
+  .del_diet {
+    position: absolute !important;
+    right: 7% !important;
+  }
+
+  .diet_steps .MuiStepper-root {
+    display: -webkit-inline-box;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .diet_steps .MuiStepConnector-root {
+    width: 20% !important;
+  }
+  .recipe_steps .MuiStepper-root {
+    display: -webkit-inline-box;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  .recipe_steps .MuiStepConnector-root {
+    width: 7% !important;
+  }
+  .combo_steps .MuiStepper-root {
+    display: -webkit-inline-box;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  .combo_steps .MuiStepConnector-root {
+    width: 22% !important;
+  }
+  .ing_choice {
+    margin-left: 0px !important;
+  }
+  .tabs_diet_dtl .MuiTabs-scroller {
+    overflow: scroll !important;
+  }
+  .meal_dtl_hd {
+    width: 396px !important;
+  }
+  .cellmodule4 {
+    width: 380px !important;
+  }
+  .cellmodule5 {
+    width: 365px !important;
+  }
+  .cellmodule6 {
+    width: 365px !important;
+  }
+  .cellmodule7 {
+    width: 360px !important;
+  }
+  .cellmodule3 {
+    width: 360px !important;
+  }
+  .cellmodule9 {
+    width: 360px !important;
+  }
+  .diet_val_container {
+    width: 125px;
+  }
+  .cell_dimn {
+    width: 386px;
+  }
+  .cell_dimn1 {
+    width: 380px;
+  }
+  .cell_dimn2 {
+    width: 380px;
+  }
+  .cell_dimn3 {
+    width: 380px;
+  }
+  .cell_gend {
+    width: 380px;
+  }
+  .diet_gender {
+    width: 121px;
+  }
+  .diet_val_weight {
+    width: 125px;
+  }
+  .diet_val_weight1 {
+    width: 125px;
+  }
+  .cellmodule22 {
+    width: 360px !important;
+  }
+  .cellmodule2 {
+    width: 360px !important;
+  }
+  .cellmodule1 {
+    width: 375px !important;
+  }
+  .diet_cell_weight {
+    width: 121px;
+  }
+  .diet_cell_weight2 {
+    width: 121px;
+  }
+  .w_280 {
+    width: 145px;
+  }
+  .ing_byperc {
+    margin-left: 8px;
+  }
+  .ing_byquan {
+    margin-left: 2px;
+  }
+  .export_dtl_list {
+    width: 45%;
+    padding-right: 10px;
+  }
+  .other_dtl_list {
+    width: 45%;
+    padding-right: 10px;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .cellmodule2 {
+    width: 465px !important;
+  }
+  .cellmodule22 {
+    width: 465px !important;
+  }
+  .cellmodule1 {
+    width: 580px !important;
+  }
+  .cellmodule3 {
+    width: 465px !important;
+  }
+  .cellmodule5 {
+    width: 470px !important;
+  }
+  .cellmodule6 {
+    width: 585px !important;
+  }
+  .cellmodule7 {
+    width: 465px !important;
+  }
+  .cellmodule9 {
+    width: 490px !important;
+  }
+  .cellmodule4 {
+    width: 570px;
+  }
+  .diet_val_container {
+    width: 122px;
+  }
+  .cell_dimn {
+    width: 635px;
+  }
+  .cell_dimn1 {
+    width: 570px;
+  }
+  .cell_dimn2 {
+    width: 570px;
+  }
+  .cell_dimn3 {
+    width: 570px;
+  }
+  .cell_gend {
+    width: 560px;
+  }
+  .diet_gender {
+    width: 121px;
+  }
+  .diet_val_weight {
+    width: 125px;
+  }
+  .diet_val_weight1 {
+    width: 125px;
+  }
+  .diet_cell_weight {
+    width: 121px;
+  }
+  .diet_cell_weight2 {
+    width: 121px;
+  }
+  .w_280 {
+    width: 250px;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1400px) {
+  .cell_dimn {
+    width: 616px !important;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1440px) {
+  .cellmodule {
+    width: 785px !important;
+  }
+  .cellmodule2 {
+    width: 470px !important;
+  }
+  .cellmodule22 {
+    width: 465px !important;
+  }
+  .cellmodule1 {
+    width: 650px !important;
+  }
+  .cellmodule3 {
+    width: 465px !important;
+  }
+  .cellmodule5 {
+    width: 465px !important;
+  }
+  .cellmodule6 {
+    width: 645px !important;
+  }
+  .cellmodule7 {
+    width: 465px !important;
+  }
+  .cellmodule9 {
+    width: 555px !important;
+  }
+  .diet_val_container {
+    width: 127px;
+  }
+  .cell_dimn {
+    width: 723px;
+  }
+  .cell_dimn1 {
+    width: 610px;
+  }
+  .cell_dimn2 {
+    width: 570px;
+  }
+  .cell_dimn3 {
+    width: 575px;
+  }
+  .cell_gend {
+    width: 570px;
+  }
+  .diet_gender {
+    width: 121px;
+  }
+  .diet_val_weight {
+    width: 125px;
+  }
+  .diet_val_weight1 {
+    width: 125px;
+  }
+  .diet_cell_weight {
+    width: 121px;
+  }
+  .diet_cell_weight2 {
+    width: 121px;
+  }
+}
+
+@media (min-width: 1300px) and (max-width: 1400px) {
+  .ing_byperc {
+    margin-left: 16px;
+  }
+  .ing_byquan {
+    margin-left: 10px;
+  }
+  .cellmodule6 {
+    width: 560px !important;
+  }
+  .cellmodule1 {
+    width: 565px !important;
+  }
+  .cellmodule9 {
+    width: 500px !important;
+  }
+  .diet_val_weight {
+    width: 125px;
+  }
+  .diet_val_weight1 {
+    width: 125px;
+  }
+  .diet_cell_weight {
+    width: 121px;
+  }
+  .diet_cell_weight2 {
+    width: 121px;
+  }
+  .cell_dimn1 {
+    width: 590px;
+  }
+  .cell_dimn2 {
+    width: 590px;
+  }
+  .cell_dimn3 {
+    width: 590px;
+  }
+}
+
+@media (min-width: 1441px) and (max-width: 1600px) {
+  .cellmodule {
+    width: 785px !important;
+  }
+  .cellmodule2 {
+    width: 540px !important;
+  }
+  .cellmodule22 {
+    width: 465px !important;
+  }
+  .cellmodule1 {
+    width: 755px !important;
+  }
+  .cellmodule3 {
+    width: 465px !important;
+  }
+  .cellmodule5 {
+    width: 475px !important;
+  }
+  .cellmodule6 {
+    width: 755px !important;
+  }
+  .cellmodule7 {
+    width: 465px !important;
+  }
+  .cellmodule9 {
+    width: 645px !important;
+  }
+  .diet_val_container {
+    width: 130px;
+  }
+  .cell_dimn {
+    width: 731px;
+  }
+  .cell_dimn1 {
+    width: 715px;
+  }
+  .cell_dimn2 {
+    width: 630px;
+  }
+  .cell_dimn3 {
+    width: 590px;
+  }
+  .cell_gend {
+    width: 560px;
+  }
+  .diet_gender {
+    width: 129px;
+  }
+  .diet_val_weight {
+    width: 145px;
+  }
+  .diet_val_weight1 {
+    width: 130px;
+  }
+  .diet_cell_weight {
+    width: 145px;
+  }
+  .diet_cell_weight2 {
+    width: 127px;
+  }
+}
+
+@media (min-width: 1601px) and (max-width: 1919px) {
+  .cellmodule {
+    width: 782px !important;
+  }
+  .cellmodule2 {
+    width: 595px !important;
+  }
+  .cellmodule22 {
+    width: 510px !important;
+  }
+  .cellmodule1 {
+    width: 830px !important;
+  }
+  .cellmodule3 {
+    width: 465px !important;
+  }
+  .cellmodule5 {
+    width: 580px !important;
+  }
+  .cellmodule6 {
+    width: 815px !important;
+  }
+  .cellmodule7 {
+    width: 465px !important;
+  }
+  .cellmodule9 {
+    width: 705px !important;
+  }
+  .diet_val_container {
+    width: 154px;
+  }
+  .cell_dimn {
+    width: 885px;
+  }
+  .cell_dimn1 {
+    width: 780px;
+  }
+  .cell_dimn2 {
+    width: 680px;
+  }
+  .cell_dimn3 {
+    width: 613px;
+  }
+  .cell_gend {
+    width: 662px;
+  }
+  .diet_gender {
+    width: 140px;
+  }
+  .diet_val_weight {
+    width: 150px;
+  }
+  .diet_val_weight1 {
+    width: 140px;
+  }
+  .diet_cell_weight {
+    width: 155px;
+  }
+  .diet_cell_weight2 {
+    width: 140px;
+  }
+}
+
+/* Extra Large Screens */
+@media (min-width: 1920px) {
+  .cellmodule5 {
+    width: 590px !important;
+  }
+  .cellmodule2 {
+    width: 591px !important;
+  }
+  .cellmodule22 {
+    width: 515px !important;
+  }
+  .cellmodule6 {
+    width: 825px !important;
+  }
+  .cellmodule7 {
+    width: 465px !important;
+  }
+  .cellmodule3 {
+    width: 465px !important;
+  }
+  .cellmodule9 {
+    width: 710px !important;
+  }
+  .diet_val_container {
+    width: 153px;
+  }
+  .cell_dimn {
+    width: 905px;
+  }
+  .cell_dimn1 {
+    width: 780px;
+  }
+  .cell_dimn2 {
+    width: 680px;
+  }
+  .cell_dimn3 {
+    width: 610px;
+  }
+  .cell_gend {
+    width: 667px;
+  }
+  .diet_gender {
+    width: 138px;
+  }
+  .diet_val_weight {
+    width: 150px;
+  }
+  .diet_val_weight1 {
+    width: 135px;
+  }
+  .cellmodule1 {
+    width: 825px !important;
+  }
+  .diet_cell_weight {
+    width: 155px;
+  }
+  .diet_cell_weight2 {
+    width: 145px;
+  }
+}

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invoice details header</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Mock for Sourav (2 Nov): the Invoice details header card, one template drawn for every scenario. Layout from the
+     compliance export permit details (Figma CITES Animal Shipment Documents 5881:50589; antz-codebase
+     ExportPermitDetailsContent + PdfFileCard). Antz web theme tokens, as the build uses them. -->
+<style>
+:root{--bg:#EFF5F2;--text:#44544A;--quiet:#7A8684;--line:#DAE7DF;--outline:#C3CEC7;--display:#E8F4F2;--green:#37BD69;--greenDark:#006D35;--tert:#FA6140;--grey300:#E0E0E0;--err:#E93353;--errBg:#FFD3D3;--notes:#FCF4AE;--amber:#B26A00;--info:#dff9f7;--ink:#1F415B}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Inter,sans-serif;color:var(--text);padding:32px 40px}
+h1{font-size:24px;font-weight:600;margin:0 0 6px}
+.lead{max-width:1290px;margin:0 0 12px;font-size:14px;color:var(--quiet);line-height:1.55}.lead b{color:var(--text);font-weight:600}
+.rules{max-width:1290px;margin:0 0 28px;padding:16px 20px;background:#fff;border-radius:10px;font-size:14px;line-height:1.6}
+.rules h2{font-size:15px;margin:0 0 6px;font-weight:600}.rules ul{margin:0;padding-left:18px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 28px}.toc a{font-size:13px;color:var(--greenDark);background:#fff;border:1px solid var(--line);border-radius:16px;padding:4px 12px;text-decoration:none}
+.sc{margin:0 0 36px}
+.sc-h{display:flex;align-items:baseline;gap:12px;margin:0 0 10px}.sc-h b{font-size:16px;font-weight:600}.sc-h span{font-size:13px;color:var(--quiet)}
+.frame{max-width:1290px}.frame.narrow{max-width:980px}
+.card{background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(76,78,100,.08);padding:24px}
+.head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.ttl{min-width:0}.ttl h5{margin:0;font-size:24px;font-weight:600;display:inline}.ttl .sub{font-size:14px;color:var(--quiet);margin-left:12px}
+.ttl h5.q{color:var(--quiet)}
+.acts{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.btn{height:40px;padding:0 20px;border-radius:8px;font:500 16px Inter;text-transform:uppercase;letter-spacing:.4px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--outline);background:#fff;color:var(--greenDark);white-space:nowrap}
+.btn.pri{background:var(--green);border-color:var(--green);color:#fff}
+.kb{width:32px;height:32px;display:grid;place-items:center;border-radius:50%;color:var(--text)}
+.pills{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:12px;font-size:12px;font-weight:600;white-space:nowrap}
+.ok{background:var(--display);color:var(--greenDark)}.warn{background:#FFBDA833;color:var(--tert)}.bad{background:var(--errBg);color:var(--err)}.check{background:var(--notes);color:var(--amber)}.info{background:var(--info);color:var(--ink)}.quiet{background:rgba(0,0,0,.05);color:var(--text)}
+.mis{font-size:14px;color:var(--tert)}
+.band{margin-top:16px;padding:12px 16px;border-radius:8px;font-size:14px;line-height:1.5;display:flex;gap:10px}
+.band.t{background:#FFBDA826;color:var(--text)}.band.e{background:#FFD3D366;color:var(--text)}
+.band b{font-weight:600}
+/* ExportPermitDetailsContent: px 6, py 4, 1px OutlineVariant, 8px corners, displaybgPrimary at 40% */
+.details{margin-top:16px;padding:16px 24px;border:1px solid var(--outline);border-radius:8px;background:rgba(232,244,242,.4)}
+.row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:space-between}
+.col{flex:0 1 180px;min-width:0}
+.lab{font-size:16px;color:var(--quiet);margin-bottom:4px}
+.val{font-size:16px;font-weight:500;color:var(--text);margin-bottom:16px;overflow-wrap:anywhere}.col .val:last-child{margin-bottom:0}
+.val a{color:var(--greenDark);text-decoration:underline;text-underline-offset:2px}
+.val .m{color:var(--greenDark);font-weight:600;cursor:pointer;white-space:nowrap}
+.val.tert{color:var(--tert)}.val.q{color:var(--quiet);font-weight:400}
+.doccol{flex:0 0 150px;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+/* PdfFileCard: white, 1px grey[300], no shadow; 100px tile, name under it; the Figma card adds ⋮ */
+.pdf{width:150px;background:#fff;border:1px solid var(--grey300);border-radius:8px;cursor:pointer;overflow:hidden}
+.tile{height:100px;margin:8px;border-radius:4px;background:rgba(255,189,168,.3);display:grid;place-items:center;overflow:hidden;position:relative}
+.tile.img{background:#3A403D}.tile.img .photo{width:100%;height:100%;background:linear-gradient(160deg,#f4efe4 0 62%,#d9d2c3 62% 100%);display:grid;place-items:start center;padding-top:10px}
+.tile.img .photo i{display:block;width:70%;height:4px;background:#bdb4a2;margin:4px auto 0;border-radius:2px}
+.name{display:flex;align-items:center;gap:4px;padding:0 4px 8px 8px;font-size:12px}
+.name span:first-child{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kebab{flex:0 0 20px;width:20px;height:20px;display:grid;place-items:center;color:var(--text)}
+.empty{width:150px;height:148px;border:1px dashed var(--outline);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--quiet);font-size:12px;text-align:center;padding:8px;background:#fff}
+.empty .btn{height:32px;padding:0 10px;font-size:13px}
+.more{font:600 14px Inter;color:var(--greenDark);text-transform:uppercase;padding:2px 4px;cursor:pointer}
+.menu{position:absolute;right:-8px;top:100%;margin-top:4px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.12);padding:6px 0;min-width:170px;z-index:2;font-size:14px}
+.menu div{padding:8px 14px;display:flex;gap:8px;align-items:center}.menu .del{color:var(--tert)}
+.rel{position:relative}
+</style></head><body>
+
+<h1>Invoice details: header card, every scenario</h1>
+<p class="lead"><b>One template, drawn below for each state.</b> The layout is the compliance export permit details (your Figma frame): a tinted box of label-over-value pairs in four columns, and the invoice document as a card on the right. The four info tiles in today's second card move into this box. Who is looking only changes the buttons at the top right.</p>
+
+<div class="rules">
+  <h2>How the card handles each case</h2>
+  <ul>
+    <li><b>Documents:</b> the card shows the first file (the invoice). A PDF shows the PDF icon on the peach tile, and a photo shows its thumbnail. More files add "+n more" under the card, which opens the viewer on the next one. With no file, a dashed box says "No invoice uploaded", and Upload shows only to the clerk while they hold the invoice.</li>
+    <li><b>The ⋮ on the card:</b> View, Download, and Remove (the last only for the clerk while they hold it).</li>
+    <li><b>Challans:</b> up to three links, then "+n more", which opens the challan list. Before any are added: "None added yet".</li>
+    <li><b>Long text:</b> the file name ends in "…" with the full name on hover. A long vendor name wraps in the title, and values wrap inside their column.</li>
+    <li><b>Messages:</b> a returned or rejected invoice shows one band above the box with who, when and the note. Nothing else moves.</li>
+    <li><b>Buttons by role and stage:</b> clerk (Pending match, Correction needed): action plus ⋮ Edit / Delete. Head (Under review): Send back plus Approve, or Accept as billed and Pay as received on discrepancies. Anything else: no buttons.</li>
+    <li><b>Narrow windows:</b> the columns and the card wrap. Nothing overlaps.</li>
+  </ul>
+</div>
+
+<div class="toc" id="toc"></div>
+<div id="root"></div>
+
+<script>
+const PDF = '<img src="../../public/icons/file-pdf.svg" alt="PDF" width="40" height="40">'
+const KEB = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>'
+const BOT = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a2 2 0 0 1 1 3.7V7h4a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3h4V5.7A2 2 0 0 1 12 2zM9 12a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>'
+const ALR = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>'
+
+const challans = list => {
+  if (!list.length) return '<span class="q">None added yet</span>'
+  const shown = list.slice(0, 3).map(c => `<a href="#">${c}</a>`).join(', ')
+  return list.length > 3 ? `${shown} <span class="m">+${list.length - 3} more</span>` : shown
+}
+const docCard = (docs, canUpload, canRemove, menuOpen) => {
+  if (!docs.length) return `<div class="empty">No invoice uploaded${canUpload ? '<span class="btn">Upload</span>' : ''}</div>`
+  const d = docs[0]
+  const tile = d.photo ? '<div class="tile img"><div class="photo"><i></i><i></i><i></i><i></i></div></div>' : `<div class="tile">${PDF}</div>`
+  const menu = menuOpen ? `<div class="menu"><div>View</div><div>Download</div>${canRemove ? '<div class="del">Remove</div>' : ''}</div>` : ''
+  return `<div class="rel"><div class="pdf" title="${d.name}">${tile}<div class="name"><span>${d.name}</span><span class="kebab">${KEB}</span></div></div>${menu}</div>`
+    + (docs.length > 1 ? `<span class="more">+${docs.length - 1} more</span>` : '')
+}
+const val = (v, cls = '') => `<div class="val ${cls}">${v}</div>`
+
+const S = [
+  { id: 'head-matched', t: 'Head · Under review · Matched · 1 PDF', why: 'The common case.',
+    no: 'GVF/2610/044', bd: 'BD-26-0005', vendor: 'Green Valley Farms', pills: [['ok', 'Matched']],
+    date: '5 Oct 26', total: '₹4,914', ch: ['GVF-3284'], items: 3, match: ['Matched'], stage: 'Under review', by: 'Mark Ellis', on: '6 Oct 26',
+    docs: [{ name: 'GVF-2610-044.pdf' }], acts: '<span class="btn">Send back</span><span class="btn pri">Approve</span>' },
+  { id: 'head-disc', t: 'Head · Under review · With discrepancies · 3 documents', why: '"+2 more" under the card; the head chooses how it is paid.',
+    no: 'MGT/26/571', bd: 'BD-26-0007', vendor: 'Mysore Grain Traders', pills: [['warn', 'With discrepancies']], mis: '2 items mismatch',
+    date: '13 Oct 26', total: '₹73,426.50', ch: ['MGT-3707', 'MGT-3713'], items: 6, match: ['2 items mismatch', 'tert'], stage: 'Under review', by: 'Mark Ellis', on: '14 Oct 26',
+    docs: [{ name: 'MGT-26-571.pdf' }, { name: 'MGT-3707.pdf' }, { name: 'MGT-3713.pdf' }],
+    acts: '<span class="btn">Send back</span><span class="btn">Accept as billed</span><span class="btn pri">Pay as received</span>' },
+  { id: 'clerk-fix', t: 'Clerk · Correction needed', why: 'The head\'s note in one band; Fix plus ⋮ Edit / Delete; the card ⋮ open, with Remove.',
+    no: 'BVS/26/2207', bd: 'BD-26-0006', vendor: 'Bharat Vet Supplies', pills: [['warn', 'Correction needed']],
+    band: ['t', 'Sent back by <b>Daniel Brooks</b> · 1 Nov, 4:10 PM', '“Wormer billed 4 bags, received 3. Get the corrected bill.”'],
+    date: '2 Oct 26', total: '₹12,880', ch: ['BVS-2098', 'BVS-2107'], items: 4, match: ['1 item mismatch', 'tert'], stage: 'Correction needed', by: 'Mark Ellis', on: '3 Oct 26',
+    docs: [{ name: 'BVS-26-2207.pdf' }, { name: 'BVS-2098.pdf' }], menu: true, remove: true,
+    acts: `<span class="btn pri">Fix</span><span class="kb">${KEB}</span>` },
+  { id: 'clerk-pending', t: 'Clerk · Pending match · Antz AI read, no challans yet', why: 'Total is what Antz AI read off the bill; Challans "None added yet"; match not known yet.',
+    no: 'AFM/INV/0412', bd: 'BD-26-0024', vendor: 'Annapurna Fruit Mart', pills: [['ok', BOT + 'Read']],
+    date: '28 Oct 26', total: '₹9,640', ch: [], items: 5, match: ["Not matched yet", "q"], stage: 'Pending match', by: 'Mark Ellis', on: '2 Nov 26',
+    docs: [{ name: 'AFM-INV-0412.pdf' }], acts: `<span class="btn pri">+ Challan</span><span class="kb">${KEB}</span>` },
+  { id: 'clerk-failed', t: 'Clerk · Pending match · Antz AI read failed, photo of the bill', why: 'Nothing was read, so every fact is "—"; the photo shows as its thumbnail.',
+    no: 'SAI/1022', bd: 'BD-26-0027', vendor: 'Not read', vq: true, pills: [['bad', BOT + 'Failed']],
+    band: ['e', '<b>Antz AI couldn\'t read this bill.</b>', 'The photo is too dark. Try again, or enter it by hand.'],
+    date: '—', total: '—', ch: [], items: '—', match: ['—', 'q'], stage: 'Pending match', by: 'Mark Ellis', on: '2 Nov 26',
+    docs: [{ name: 'IMG_20261102_0931.jpg', photo: true }], acts: `<span class="btn">Enter by hand</span><span class="btn pri">Try again</span><span class="kb">${KEB}</span>` },
+  { id: 'many', t: 'Viewer · In verification · 7 challans, long names', why: 'Three challan links then "+4 more"; the long vendor name wraps; the long file name ends in "…".',
+    no: 'DFL/INV/26/0917-A', bd: 'BD-26-0031', vendor: 'Deccan Feeds and Fodder Suppliers Private Limited', pills: [['ok', 'Matched']],
+    date: '14 Oct 26', total: '₹1,49,415', ch: ['DFL/26/2560', 'DFL/26/2568', 'DFL/26/2571', 'DFL/26/2575', 'DFL/26/2580', 'DFL/26/2583', 'DFL/26/2590'], items: 11,
+    match: ['Matched'], stage: 'In verification', by: 'Mark Ellis', on: '15 Oct 26',
+    docs: [{ name: 'Deccan_Feeds_Tax_Invoice_DFL-INV-26-0917-A_October.pdf' }, { name: 'DFL-26-2560.pdf' }, { name: 'DFL-26-2568.pdf' }, { name: 'gate-sheet.jpg', photo: true }, { name: 'DFL-26-2571.pdf' }], acts: '' },
+  { id: 'rejected', t: 'Viewer · Rejected', why: 'The reason in one band; no buttons.',
+    no: 'MPF-B-2727', bd: 'BD-26-0022', vendor: 'Malnad Poultry Farms', pills: [['bad', 'Rejected']],
+    band: ['e', 'Rejected by the approver, recorded by <b>Rachel Morgan</b> · 24 Oct', '“Rate above the agreed contract for October.”'],
+    date: '13 Oct 26', total: '₹4,600', ch: ['MPF/2727'], items: 2, match: ['Matched'], stage: 'Rejected', by: 'Mark Ellis', on: '13 Oct 26',
+    docs: [{ name: 'MPF-B-2727.pdf' }], acts: '' },
+  { id: 'nodoc', t: 'Viewer · Payment pending · no document on the record', why: 'An older record without its paper: the dashed box, and no Upload for anyone but the clerk holding it.',
+    no: 'BVS/7788', bd: 'BD-26-0020', vendor: 'Bharat Vet Supplies', pills: [['ok', 'Matched']],
+    date: '8 Oct 26', total: '₹50,089.50', ch: ['BVS-2119'], items: 3, match: ['Matched'], stage: 'Payment pending', by: 'Mark Ellis', on: '9 Oct 26',
+    docs: [], acts: '' },
+  { id: 'narrow', t: 'Head · Under review · narrow window (980px)', why: 'Columns and the card wrap to the next line; the buttons drop under the title.', narrow: true,
+    no: 'MGT/26/571', bd: 'BD-26-0007', vendor: 'Mysore Grain Traders', pills: [['warn', 'With discrepancies']], mis: '2 items mismatch',
+    date: '13 Oct 26', total: '₹73,426.50', ch: ['MGT-3707', 'MGT-3713'], items: 6, match: ['2 items mismatch', 'tert'], stage: 'Under review', by: 'Mark Ellis', on: '14 Oct 26',
+    docs: [{ name: 'MGT-26-571.pdf' }, { name: 'MGT-3707.pdf' }, { name: 'MGT-3713.pdf' }],
+    acts: '<span class="btn">Send back</span><span class="btn">Accept as billed</span><span class="btn pri">Pay as received</span>' }
+]
+
+const clerkHolds = s => s.stage === 'Pending match' || s.stage === 'Correction needed'
+document.getElementById('toc').innerHTML = S.map((s, i) => `<a href="#${s.id}">${i + 1}. ${s.t}</a>`).join('')
+document.getElementById('root').innerHTML = S.map((s, i) => `
+<section class="sc" id="${s.id}">
+  <div class="sc-h"><b>${i + 1}. ${s.t}</b><span>${s.why}</span></div>
+  <div class="frame ${s.narrow ? 'narrow' : ''}"><div class="card">
+    <div class="head">
+      <div class="ttl"><h5>${s.no}</h5><span class="sub">${s.bd} · ${s.vq ? '<i>Not read</i>' : s.vendor}</span></div>
+      ${s.acts ? `<div class="acts">${s.acts}</div>` : ''}
+    </div>
+    <div class="pills">${s.pills.map(([t, l]) => `<span class="pill ${t}">${l}</span>`).join('')}${s.mis ? `<span class="mis">${s.mis}</span>` : ''}</div>
+    ${s.band ? `<div class="band ${s.band[0]}">${ALR}<div>${s.band[1]}<br>${s.band[2]}</div></div>` : ''}
+    <div class="details"><div class="row">
+      <div class="col"><div class="lab">Invoice Date</div>${val(s.date)}<div class="lab">Total</div>${val(s.total)}</div>
+      <div class="col"><div class="lab">Challans</div>${val(challans(s.ch))}<div class="lab">Items</div>${val(s.items)}</div>
+      <div class="col"><div class="lab">Match</div>${val(s.match[0], s.match[1] || '')}<div class="lab">Stage</div>${val(s.stage)}</div>
+      <div class="col"><div class="lab">Uploaded By</div>${val(s.by)}<div class="lab">Uploaded On</div>${val(s.on)}</div>
+      <div class="doccol">${docCard(s.docs, clerkHolds(s), s.remove, s.menu)}</div>
+    </div></div>
+  </div></div>
+</section>`).join('')
+</script>
+</body></html>

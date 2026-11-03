@@ -1,0 +1,194 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Add invoice and Antz AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1F415B;--text:#44544A;--quiet:#7A8684;--line:#C3CEC7;--hair:rgba(0,0,0,.08);--mint:#E8F4F2;--bg:#EFF5F2;--green:#37BD69;--gdark:#006D35;--tert:#FA6140;--err:#E93353;--n05:rgba(0,0,0,.05);--navy:#1F415B;--ai:#5B4FD6;--aibg:#F1EFFD;--sv:#DAE7DF}
+*{box-sizing:border-box}body{margin:0;background:#dfe9e5;font-family:Inter,system-ui,sans-serif;color:var(--ink);font-size:14px;-webkit-font-smoothing:antialiased}
+svg.i{width:20px;height:20px;flex:none;fill:currentColor;display:block}svg.i.s{width:18px;height:18px}
+.wrap{max-width:1500px;margin:0 auto;padding:32px 40px 80px}
+.lbl{font-size:13px;color:var(--quiet);margin:0 0 10px}
+section{margin-bottom:72px}section>h2{font-size:17px;font-weight:600;color:var(--ink);margin:0 0 4px}
+.app{background:var(--bg);border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.14);padding:24px 28px 0;position:relative;overflow:hidden}
+.crumb{color:var(--quiet);margin-bottom:10px}.crumb b{color:var(--ink);font-weight:400}
+.ttl{display:flex;align-items:center;gap:10px;font-size:24px;font-weight:500;color:var(--text);margin-bottom:18px}
+.form{max-width:1100px;display:flex;flex-direction:column;gap:16px;padding-bottom:16px}
+.card{background:#fff;border-radius:12px}
+.ch{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--hair);color:var(--text)}.ch b{font-size:16px;font-weight:600;flex:1}
+.cb{padding:20px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fld{position:relative;border:1px solid var(--line);border-radius:8px;height:56px;display:flex;align-items:center;gap:8px;padding:0 14px;font-size:16px;color:var(--ink);background:#fff}
+.fld .lb{position:absolute;top:-8px;left:10px;background:#fff;padding:0 4px;font-size:12px;color:var(--quiet)}.fld.ph{color:var(--quiet)}.fld .end{margin-left:auto;color:var(--quiet)}
+.fld.ai{border-color:#C9C3F4;background:var(--aibg)}.fld.ai .lb{background:linear-gradient(#fff 50%,var(--aibg) 50%)}
+.file{display:flex;align-items:center;gap:10px;height:52px;padding:0 6px 0 12px;border:1px solid var(--sv);border-radius:8px;background:#fff;margin-top:16px}
+.file .n{flex:1;color:var(--text)}.file .z{color:var(--quiet);font-size:12px}
+.up{border:1px dashed var(--line);border-radius:8px;height:56px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--green);font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-top:16px}
+.icb{width:36px;height:36px;display:grid;place-items:center;color:var(--quiet);border-radius:8px}.icb.red{color:var(--err)}
+.btn{height:44px;padding:0 18px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;white-space:nowrap}
+.btn.p{background:var(--green);color:#fff}.btn.o{border:1px solid var(--line);background:#fff;color:#000}.btn.ai{border:1px solid var(--ai);color:var(--ai);background:#fff}.btn.s{height:36px;padding:0 12px;font-size:13px}
+.pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:12px;font-size:12px;font-weight:600;white-space:nowrap}
+.pill.ok{background:var(--mint);color:var(--gdark)}.pill.warn{background:rgba(250,97,64,.12);color:var(--tert)}.pill.ai{background:var(--aibg);color:var(--ai)}
+.dcrow{display:flex;align-items:center;gap:14px;height:52px;padding:0 6px 0 14px;border:1px solid var(--hair);border-radius:8px}.dcrow+.dcrow{margin-top:8px}
+.dcrow .n{font-weight:500;min-width:140px}.dcrow .m{color:var(--quiet);font-size:13px;flex:1}
+.dcrow.sug{border-style:dashed;border-color:var(--line);background:#FAFCFB}
+.addl{color:var(--gdark);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:4px;padding:6px 8px}
+.subh{font-size:13px;font-weight:600;color:var(--text);margin:16px 0 8px}
+.empty{display:flex;align-items:center;justify-content:center;height:88px;border:1px dashed var(--line);border-radius:8px}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
+.rt th{background:#EEF3F1;color:var(--text);font-size:14px;font-weight:500;height:48px;padding:0 10px;text-align:left}.rt th:first-child{border-radius:10px 0 0 10px}.rt th:last-child{border-radius:0 10px 10px 0}
+.rt td{padding:12px 10px;border-bottom:1px solid var(--hair);vertical-align:middle}.rt tr:last-child td{border-bottom:0}.r{text-align:right!important}
+.it{display:flex;align-items:center;gap:10px;min-width:0}.tile{width:36px;height:36px;border-radius:8px;background:#E3ECE8;display:grid;place-items:center;color:var(--text);flex:none}
+.nm{font-size:15px;font-weight:500;color:#000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sb{font-size:13px;color:var(--quiet)}.sb.bad{color:var(--tert)}
+.in{display:flex;align-items:center;justify-content:space-between;gap:6px;height:40px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:#fff}.in u{text-decoration:none;color:var(--quiet);font-size:12px}
+.in.bad{border-color:var(--tert);background:rgba(250,97,64,.05)}.in.ai{border-color:#C9C3F4;background:var(--aibg)}.in.ph{color:var(--quiet)}
+tr.disc td{background:rgba(250,97,64,.05)}
+.sel{display:flex;align-items:center;justify-content:space-between;height:40px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:#fff;color:var(--ink);white-space:nowrap;overflow:hidden}.sel.need{border-color:var(--ai);color:var(--ai)}
+.bar{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--n05);box-shadow:0 -4px 16px rgba(0,0,0,.05);margin:0 -28px;padding:14px 28px;display:flex;align-items:center;gap:14px}
+.bar .tl{color:var(--text);font-weight:500}.bar .tv{font-size:24px;font-weight:600;color:#000}
+.tabs{display:flex;gap:28px;border-bottom:1px solid var(--sv);margin-bottom:20px}.tabs span{padding:14px 2px;font-size:16px;color:var(--quiet)}.tabs .on{color:var(--green);font-weight:500;border-bottom:2px solid var(--green)}
+.segs{display:flex;gap:12px;margin-bottom:20px}.seg{height:40px;padding:0 18px;border-radius:8px;background:var(--n05);color:var(--text);display:flex;align-items:center;font-weight:500;text-transform:uppercase;letter-spacing:.3px}.seg.on{background:var(--navy);color:#fff}
+.lt{border:1px solid var(--line);border-radius:8px;overflow:hidden}.lt th{background:var(--mint);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.17px;text-align:left;padding:0 16px;height:52px;color:var(--text)}
+.lt td{padding:14px 16px;border-top:1px solid var(--hair);vertical-align:middle}.lt td b{display:block;color:#000;font-weight:600}.lt td small{color:var(--quiet);font-size:12px}
+.spin{width:12px;height:12px;border-radius:50%;border:2px solid #D8D3FA;border-top-color:var(--ai);display:inline-block}
+.dim{position:absolute;inset:0;background:rgba(31,65,91,.45)}
+.sheet{position:absolute;top:0;right:0;bottom:0;width:560px;background:var(--bg);box-shadow:-12px 0 40px rgba(0,0,0,.18);display:flex;flex-direction:column}
+.sh{padding:20px 24px 12px}.sh .t{display:flex;align-items:center;justify-content:space-between;font-size:24px;font-weight:500;color:var(--text);margin-bottom:14px}
+.search{height:48px;border:1px solid var(--line);border-radius:8px;background:#fff;display:flex;align-items:center;gap:8px;padding:0 16px;color:var(--quiet);font-size:16px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.chip{height:36px;padding:0 14px;border-radius:18px;border:1px solid var(--line);display:flex;align-items:center;gap:6px;background:#fff}.chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.sl{flex:1;overflow:hidden;padding:4px 24px}.srow{display:flex;align-items:center;gap:14px;background:#fff;padding:14px 16px;border-bottom:1px solid var(--hair)}.srow:first-child{border-radius:12px 12px 0 0}
+.box{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--line);display:grid;place-items:center;color:#fff;flex:none}.box.on{background:var(--green);border-color:var(--green)}
+.sf{padding:16px 24px;background:#fff;border-top:1px solid var(--n05)}
+.more{color:var(--gdark);font-weight:600;padding:14px 4px}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="back" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></symbol>
+<symbol id="receipt" viewBox="0 0 24 24"><path d="M3 22V2l3 2 3-2 3 2 3-2 3 2 3-2v20l-3-2-3 2-3-2-3 2-3-2zm4-14v2h10V8zm0 4v2h10v-2zm0 4v2h7v-2z"/></symbol>
+<symbol id="store" viewBox="0 0 24 24"><path d="M2 7h20v2H2zm1 3h18v10H3zm2 2v6h6v-6zm2 2h2v2H7zM3 4h18v2H3z"/></symbol>
+<symbol id="truck" viewBox="0 0 24 24"><path d="M18 18.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m1.5-9H17V12h4.46zM6 18.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3M20 8h-3V4H3c-1.11 0-2 .89-2 2v11h2a3 3 0 0 0 6 0h6a3 3 0 0 0 6 0h2v-5z"/></symbol>
+<symbol id="list" viewBox="0 0 24 24"><path d="M7 5h14v2H7zm0 6h14v2H7zm0 6h14v2H7zM3 5h2v2H3zm0 6h2v2H3zm0 6h2v2H3z"/></symbol>
+<symbol id="box" viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44a1 1 0 0 1-1.14 0l-7.9-4.44A1 1 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44a1 1 0 0 1 1.14 0l7.9 4.44c.32.17.53.5.53.88zM12 4.15 6.04 7.5 12 10.85l5.96-3.35zM5 15.91l6 3.38v-6.71L5 9.21zm14 0v-6.7l-6 3.37v6.71z"/></symbol>
+<symbol id="eye" viewBox="0 0 24 24"><path d="M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6m0-4.5c5 0 9.27 3.11 11 7.5-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.82 9.82 0 0 0 17.64 0 9.82 9.82 0 0 0-17.64 0"/></symbol>
+<symbol id="close" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+<symbol id="trash" viewBox="0 0 24 24"><path d="M9 3v1H4v2h1v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1V4h-5V3zM7 6h10v13H7zm2 2v9h2V8zm4 0v9h2V8z"/></symbol>
+<symbol id="pdf" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm4 18H6V4h7v5h5zM8 13h2v4H8zm3 0h1.5a1.5 1.5 0 0 1 0 3H12v1h-1zm1 1v1h.5a.5.5 0 0 0 0-1zm3-1h2v1h-1v.5h1v1h-1V17h-1z"/></symbol>
+<symbol id="clip" viewBox="0 0 24 24"><path d="M16.5 6v11.5a4 4 0 0 1-8 0V5a2.5 2.5 0 0 1 5 0v10.5a1 1 0 0 1-2 0V6H10v9.5a2.5 2.5 0 0 0 5 0V5a4 4 0 0 0-8 0v12.5a5.5 5.5 0 0 0 11 0V6z"/></symbol>
+<symbol id="spark" viewBox="0 0 24 24"><path d="M12 2l2.2 6.3L20.5 10.5l-6.3 2.2L12 19l-2.2-6.3L3.5 10.5l6.3-2.2zM19 15l1 2.5 2.5 1-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1z"/></symbol>
+<symbol id="search" viewBox="0 0 24 24"><path d="M9.5 3a6.5 6.5 0 0 1 5.16 10.46l5.44 5.43-1.42 1.42-5.43-5.44A6.5 6.5 0 1 1 9.5 3m0 2a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9"/></symbol>
+<symbol id="plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+<symbol id="cal" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2m0 16H5V9h14z"/></symbol>
+</defs></svg>
+<div class="wrap">
+
+<!-- ================= 1A ================= -->
+<section id="s1a"><h2>1 · Add invoice — number, date and paper in, nothing else yet</h2><p class="lbl">One form. The only action at the bottom is the outline “Send to Antz AI”. Save appears once DCs are added.</p>
+<div class="app">
+  <div class="crumb">Bill Desk / Delivery challans / <b>Add invoice</b></div>
+  <div class="ttl"><svg class="i"><use href="#back"/></svg>Add invoice</div>
+  <div class="form">
+    <div class="card"><div class="ch"><svg class="i"><use href="#receipt"/></svg><b>Invoice</b></div><div class="cb">
+      <div class="two"><div class="fld"><span class="lb">Invoice number</span>SLA/INV/3812</div><div class="fld"><span class="lb">Invoice date</span>14/10/2026<svg class="i s end"><use href="#cal"/></svg></div></div>
+      <div class="file"><svg class="i" style="color:var(--tert)"><use href="#pdf"/></svg><span class="n">SLA-INV-3812.pdf</span><span class="z">1.4 MB</span><span class="icb red"><svg class="i s"><use href="#trash"/></svg></span></div>
+    </div></div>
+    <div class="card"><div class="ch"><svg class="i"><use href="#store"/></svg><b>Vendor</b></div><div class="cb"><div class="fld ph">Pick the vendor on the bill<svg class="i end"><use href="#chev"/></svg></div></div></div>
+    <div class="card"><div class="ch"><svg class="i"><use href="#truck"/></svg><b>Select DCs</b></div><div class="cb"><div class="empty"><span class="btn o s" style="color:var(--quiet)"><svg class="i s"><use href="#search"/></svg>Find DCs</span></div></div></div>
+  </div>
+  <div class="bar"><div style="flex:1"></div><span class="btn o">Cancel</span><span class="btn ai"><svg class="i s"><use href="#spark"/></svg>Send to Antz AI</span></div>
+</div></section>
+
+<!-- ================= 1B ================= -->
+<section id="s1b"><h2>1 · Add invoice — the clerk does it by hand</h2><p class="lbl">Vendor picked, two DCs added through Find DCs. Items fill from the DCs. Send to Antz AI is gone; Total and Save take its place.</p>
+<div class="app">
+  <div class="crumb">Bill Desk / Delivery challans / <b>Add invoice</b></div>
+  <div class="ttl"><svg class="i"><use href="#back"/></svg>Add invoice</div>
+  <div class="form">
+    <div class="card"><div class="ch"><svg class="i"><use href="#receipt"/></svg><b>Invoice</b></div><div class="cb">
+      <div class="two"><div class="fld"><span class="lb">Invoice number</span>SLA/INV/3812</div><div class="fld"><span class="lb">Invoice date</span>14/10/2026<svg class="i s end"><use href="#cal"/></svg></div></div>
+      <div class="file"><svg class="i" style="color:var(--tert)"><use href="#pdf"/></svg><span class="n">SLA-INV-3812.pdf</span><span class="z">1.4 MB</span><span class="icb red"><svg class="i s"><use href="#trash"/></svg></span></div>
+    </div></div>
+    <div class="card"><div class="ch"><svg class="i"><use href="#store"/></svg><b>Vendor</b></div><div class="cb"><div class="fld">Sri Lakshmi Agro Foods<svg class="i end"><use href="#chev"/></svg></div></div></div>
+    <div class="card"><div class="ch"><svg class="i"><use href="#truck"/></svg><b>Select DCs</b><span class="btn o s"><svg class="i s"><use href="#search"/></svg>Find DCs</span></div><div class="cb">
+      <div class="dcrow"><span class="n">SLA/2610/3797</span><span class="m">10 Oct 26 · 3 items · Rescue Kitchen</span><span class="icb"><svg class="i s"><use href="#eye"/></svg></span><span class="icb"><svg class="i s"><use href="#close"/></svg></span></div>
+      <div class="dcrow"><span class="n">SLA/2610/3805</span><span class="m">12 Oct 26 · 1 item · Rescue Kitchen</span><span class="icb"><svg class="i s"><use href="#eye"/></svg></span><span class="icb"><svg class="i s"><use href="#close"/></svg></span></div>
+    </div></div>
+    <div class="card"><div class="ch"><svg class="i"><use href="#list"/></svg><b>Items · 4</b></div><div class="cb"><table class="rt">
+      <colgroup><col><col style="width:110px"><col style="width:120px"><col style="width:130px"><col style="width:96px"><col style="width:110px"></colgroup>
+      <tr><th>Item</th><th class="r">Received</th><th class="r">Billed</th><th class="r">Rate</th><th class="r">GST</th><th class="r">Amount</th></tr>
+      <tr><td><div class="it"><span class="tile"><svg class="i s"><use href="#box"/></svg></span><span class="nm">Mango Alphonso</span></div></td><td class="r">30 kg</td><td><span class="in">30<u>kg</u></span></td><td><span class="in"><u>₹</u>120</span></td><td><span class="in">0<u>%</u></span></td><td class="r"><b>₹3,600</b></td></tr>
+      <tr><td><div class="it"><span class="tile"><svg class="i s"><use href="#box"/></svg></span><span class="nm">Pumpkin yellow</span></div></td><td class="r">15 kg</td><td><span class="in">15<u>kg</u></span></td><td><span class="in"><u>₹</u>42</span></td><td><span class="in">0<u>%</u></span></td><td class="r"><b>₹630</b></td></tr>
+      <tr><td><div class="it"><span class="tile"><svg class="i s"><use href="#box"/></svg></span><span class="nm">Papaya red lady</span></div></td><td class="r">40 kg</td><td><span class="in">40<u>kg</u></span></td><td><span class="in ph"><u>₹</u>0.00</span></td><td><span class="in">0<u>%</u></span></td><td class="r sb">—</td></tr>
+      <tr><td><div class="it"><span class="tile"><svg class="i s"><use href="#box"/></svg></span><span class="nm">Pineapple</span></div></td><td class="r">20 kg</td><td><span class="in">20<u>kg</u></span></td><td><span class="in ph"><u>₹</u>0.00</span></td><td><span class="in">0<u>%</u></span></td><td class="r sb">—</td></tr>
+    </table></div></div>
+  </div>
+  <div class="bar"><span class="tl">Total</span><span class="tv">₹4,230</span><div style="flex:1"></div><span class="btn o">Cancel</span><span class="btn p">Save invoice</span></div>
+</div></section>
+
+<!-- ================= 2 ================= -->
+<section id="s2"><h2>2 · Invoiced › To connect</h2><p class="lbl">Invoices sent to Antz AI wait here, beside Matched and With discrepancies. A row still being read can’t be opened.</p>
+<div class="app" style="padding-bottom:24px">
+  <div class="crumb">Bill Desk / <b>Delivery challans</b></div>
+  <div style="background:#fff;border-radius:12px;padding:24px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:24px;font-weight:500;color:var(--text)">Delivery challans</span><span class="btn p" style="height:40px;text-transform:uppercase"><svg class="i s"><use href="#plus"/></svg>Add invoice</span></div>
+    <div class="tabs"><span>To Bill (20)</span><span class="on">Invoiced (12)</span><span>All (66)</span></div>
+    <div class="segs"><span class="seg on">To connect (3)</span><span class="seg">Matched (6)</span><span class="seg">With discrepancies (3)</span></div>
+    <table class="lt"><colgroup><col style="width:28%"><col style="width:18%"><col><col style="width:12%"><col style="width:16%"><col style="width:150px"></colgroup>
+      <tr><th>Vendor · invoice</th><th>Antz AI</th><th>DCs</th><th class="r">Total</th><th>Uploaded</th><th></th></tr>
+      <tr><td><b>Sri Lakshmi Agro Foods</b><small>SLA/INV/3812 · 14 Oct 26</small></td><td><span class="pill ok"><svg class="i s" style="width:14px;height:14px"><use href="#check"/></svg>Read</span></td><td>SLA/2610/3797, SLA/2610/3805</td><td class="r"><b>₹11,700</b></td><td>Mark Ellis<br><small>31 Oct · 10:42 AM</small></td><td class="r"><span class="btn o s">Connect DCs</span></td></tr>
+      <tr><td><b>Kaveri Meat Suppliers</b><small>KMS/INV/1190 · 15 Oct 26</small></td><td><span class="pill ai">Read · check 2</span></td><td><small>—</small></td><td class="r"><b>₹41,870</b></td><td>Mark Ellis<br><small>31 Oct · 10:30 AM</small></td><td class="r"><span class="btn o s">Connect DCs</span></td></tr>
+      <tr><td><b style="color:var(--quiet)">Reading…</b><small>ND/2026/1104</small></td><td><span class="pill ai"><span class="spin"></span>Reading</span></td><td><small>—</small></td><td class="r"><small>—</small></td><td>Mark Ellis<br><small>31 Oct · 10:48 AM</small></td><td></td></tr>
+    </table>
+  </div>
+</div></section>
+
+<!-- ================= 3 ================= -->
+<section id="s3"><h2>3 · Connect DCs — an invoice Antz AI has read</h2><p class="lbl">The same form as Add invoice, filled by the AI. Purple = the AI wasn’t sure. DCs printed on the bill are added already; one suggestion below. Each bill line is paired with a DC item; one needs picking.</p>
+<div class="app">
+  <div class="crumb">Bill Desk / Invoiced / <b>SLA/INV/3812</b></div>
+  <div class="ttl"><svg class="i"><use href="#back"/></svg>SLA/INV/3812<span class="pill ai"><svg class="i s" style="width:14px;height:14px"><use href="#spark"/></svg>Read by Antz AI</span></div>
+  <div class="form">
+    <div class="card"><div class="ch"><svg class="i"><use href="#receipt"/></svg><b>Invoice</b></div><div class="cb">
+      <div class="two"><div class="fld"><span class="lb">Invoice number</span>SLA/INV/3812</div><div class="fld"><span class="lb">Invoice date</span>14/10/2026<svg class="i s end"><use href="#cal"/></svg></div></div>
+      <div class="file"><svg class="i" style="color:var(--tert)"><use href="#pdf"/></svg><span class="n">SLA-INV-3812.pdf</span><span class="z">1.4 MB</span><span class="icb"><svg class="i s"><use href="#eye"/></svg></span></div>
+    </div></div>
+    <div class="card"><div class="ch"><svg class="i"><use href="#store"/></svg><b>Vendor</b></div><div class="cb"><div class="fld">Sri Lakshmi Agro Foods<svg class="i end"><use href="#chev"/></svg></div></div></div>
+    <div class="card"><div class="ch"><svg class="i"><use href="#truck"/></svg><b>Select DCs</b><span class="btn o s"><svg class="i s"><use href="#search"/></svg>Find DCs</span></div><div class="cb">
+      <div class="dcrow"><span class="n">SLA/2610/3797</span><span class="m">10 Oct 26 · 3 items · Rescue Kitchen</span><span class="pill ai">On the bill</span><span class="icb"><svg class="i s"><use href="#eye"/></svg></span><span class="icb"><svg class="i s"><use href="#close"/></svg></span></div>
+      <div class="dcrow"><span class="n">SLA/2610/3805</span><span class="m">12 Oct 26 · 1 item · Rescue Kitchen</span><span class="pill ai">On the bill</span><span class="icb"><svg class="i s"><use href="#eye"/></svg></span><span class="icb"><svg class="i s"><use href="#close"/></svg></span></div>
+      <div class="subh">Suggested</div>
+      <div class="dcrow sug"><span class="n">SLA/2610/3818</span><span class="m">14 Oct 26 · has Guava</span><span class="icb"><svg class="i s"><use href="#eye"/></svg></span><span class="addl"><svg class="i s"><use href="#plus"/></svg>Add</span></div>
+    </div></div>
+    <div class="card"><div class="ch"><svg class="i"><use href="#list"/></svg><b>Items · 5</b></div><div class="cb"><table class="rt">
+      <colgroup><col><col style="width:200px"><col style="width:96px"><col style="width:112px"><col style="width:118px"><col style="width:88px"><col style="width:100px"></colgroup>
+      <tr><th>On the bill</th><th>DC item</th><th class="r">Received</th><th class="r">Billed</th><th class="r">Rate</th><th class="r">GST</th><th class="r">Amount</th></tr>
+      <tr><td><span class="nm">MANGO ALPHONSO</span></td><td><span class="sel">Mango Alphonso<svg class="i s"><use href="#chev"/></svg></span></td><td class="r">30 kg</td><td><span class="in">30<u>kg</u></span></td><td><span class="in"><u>₹</u>120</span></td><td><span class="in">0<u>%</u></span></td><td class="r"><b>₹3,600</b></td></tr>
+      <tr class="disc"><td><span class="nm">SUGARCANE CUT</span><div class="sb bad">Billed more than received</div></td><td><span class="sel">Sugarcane (cut)<svg class="i s"><use href="#chev"/></svg></span></td><td class="r">15 kg</td><td><span class="in bad">35<u>kg</u></span></td><td><span class="in"><u>₹</u>40</span></td><td><span class="in">0<u>%</u></span></td><td class="r"><b>₹1,400</b></td></tr>
+      <tr><td><span class="nm">PAPAYA RED LADY</span></td><td><span class="sel">Papaya red lady<svg class="i s"><use href="#chev"/></svg></span></td><td class="r">40 kg</td><td><span class="in ai">40<u>kg</u></span></td><td><span class="in ai"><u>₹</u>85</span></td><td><span class="in">0<u>%</u></span></td><td class="r"><b>₹3,400</b></td></tr>
+      <tr><td><span class="nm">GUAVA ALHBD</span></td><td><span class="sel need">Pick the DC item<svg class="i s"><use href="#chev"/></svg></span></td><td class="r sb">—</td><td><span class="in">40<u>kg</u></span></td><td><span class="in"><u>₹</u>60</span></td><td><span class="in">0<u>%</u></span></td><td class="r"><b>₹2,400</b></td></tr>
+      <tr><td><span class="nm">PINEAPPLE</span></td><td><span class="sel">Pineapple<svg class="i s"><use href="#chev"/></svg></span></td><td class="r">20 kg</td><td><span class="in">20<u>kg</u></span></td><td><span class="in"><u>₹</u>45</span></td><td><span class="in">0<u>%</u></span></td><td class="r"><b>₹900</b></td></tr>
+    </table></div></div>
+  </div>
+  <div class="bar"><span class="tl">Total</span><span class="tv">₹11,700</span><span class="pill warn">1 discrepancy</span><div style="flex:1"></div><span class="btn o">Cancel</span><span class="btn p">Submit</span></div>
+</div></section>
+
+<!-- ================= 4 ================= -->
+<section id="s4"><h2>4 · Find DCs</h2><p class="lbl">The big list lives only here: this vendor’s open DCs, searched and filtered, “Add n DCs” pinned. Opened from Select DCs on either path.</p>
+<div class="app" style="height:780px">
+  <div class="crumb">Bill Desk / Invoiced / <b>KMS/INV/1190</b></div>
+  <div class="ttl"><svg class="i"><use href="#back"/></svg>KMS/INV/1190</div>
+  <div class="dim"></div>
+  <div class="sheet">
+    <div class="sh"><div class="t">Find DCs<svg class="i"><use href="#close"/></svg></div><div class="search"><svg class="i"><use href="#search"/></svg>Search DC number or item</div>
+      <div class="chips"><span class="chip on">Before the invoice date</span><span class="chip">Last 7 days</span><span class="chip">Last 30 days</span><span class="chip">Custom</span><span class="chip">All warehouses<svg class="i s"><use href="#chev"/></svg></span></div></div>
+    <div class="sl">
+      <div class="srow"><span class="box on"><svg class="i s" style="width:14px;height:14px"><use href="#check"/></svg></span><div style="flex:1"><div class="nm">KMS-2281</div><div class="sb">15 Oct 26 · Chicken whole (dressed)</div></div><span class="pill ok">3 of 3 on the bill</span><span class="icb"><svg class="i s"><use href="#eye"/></svg></span></div>
+      <div class="srow"><span class="box on"><svg class="i s" style="width:14px;height:14px"><use href="#check"/></svg></span><div style="flex:1"><div class="nm">KMS-2286</div><div class="sb">15 Oct 26 · Beef boneless, Beef mince</div></div><span class="pill ok">2 of 2 on the bill</span><span class="icb"><svg class="i s"><use href="#eye"/></svg></span></div>
+      <div class="srow"><span class="box"></span><div style="flex:1"><div class="nm">KMS-2287</div><div class="sb">15 Oct 26 · Liver (beef), Beef with bone</div></div><span class="icb"><svg class="i s"><use href="#eye"/></svg></span></div>
+      <div class="srow"><span class="box"></span><div style="flex:1"><div class="nm">KMS-2271</div><div class="sb">15 Oct 26 · 3 items</div></div><span class="icb"><svg class="i s"><use href="#eye"/></svg></span></div>
+      <div class="srow"><span class="box"></span><div style="flex:1"><div class="nm">KMS-2284</div><div class="sb">15 Oct 26 · 2 items</div></div><span class="icb"><svg class="i s"><use href="#eye"/></svg></span></div>
+      <div class="srow"><span class="box"></span><div style="flex:1"><div class="nm">KMS-2283</div><div class="sb">15 Oct 26 · 1 item</div></div><span class="icb"><svg class="i s"><use href="#eye"/></svg></span></div>
+      <div class="more">Show more</div>
+    </div>
+    <div class="sf"><span class="btn p" style="width:100%">Add 2 DCs</span></div>
+  </div>
+</div></section>
+</div></body></html>

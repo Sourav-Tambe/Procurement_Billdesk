@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Goods receipt, 20 lines</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EFF5F2;--text:#44544A;--quiet:#7A8684;--line:#DAE7DF;--outline:#C3CEC7;--green:#37BD69;--gdark:#006D35;--tint:#E8F4F2;--ink:#1F415B;--red:#E93353;--tert:#FA6140;--head:#E8F4F2}
+*{box-sizing:border-box}body{margin:0;background:#5d7a7d;font-family:Inter,sans-serif;color:var(--text);padding:32px}
+.intro{background:#fff;border-radius:12px;padding:20px 24px;margin-bottom:24px;max-width:1240px}.intro h1{font-size:22px;margin:0 0 6px}.intro p{margin:0;font-size:14px;color:var(--quiet)}
+.opt{margin-bottom:40px}.opt h2{color:#fff;font-size:18px;font-weight:600;margin:0 0 4px}.opt p{color:#dfe9e6;font-size:14px;margin:0 0 12px;max-width:1100px}
+.rec{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:2px 10px;border-radius:10px;margin-left:8px;vertical-align:middle}
+/* the sheet: a fixed 1240 × 760 window, the size of a laptop screen inside the app */
+.sheet{width:1240px;height:760px;background:#fff;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.hd{height:72px;flex:none;display:flex;align-items:center;gap:12px;padding:0 24px;border-bottom:1px solid rgba(0,0,0,.05)}
+.tile{width:40px;height:40px;border-radius:8px;background:var(--tint);display:grid;place-items:center}
+.ttl{font-size:20px;font-weight:500}.chip{background:rgba(0,0,0,.05);color:var(--ink);padding:4px 10px;border-radius:6px;font-weight:500}
+.pill{height:24px;padding:0 10px;border-radius:12px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;background:var(--tint);color:var(--gdark)}
+.btn{height:40px;padding:0 16px;border-radius:8px;display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;text-transform:uppercase;letter-spacing:.4px}
+.btn.o{border:1px solid var(--outline);color:var(--green)}.btn.p{background:var(--green);color:#fff}
+.bd{flex:1;min-height:0;overflow:auto;background:var(--bg);padding:20px 24px 24px;display:flex;flex-direction:column;gap:16px}
+.card{background:#fff;border-radius:12px;padding:16px}.ch{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:600;margin-bottom:12px}
+table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:14px}
+th{background:var(--head);text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:0 14px;height:44px;position:sticky;top:0;z-index:1}
+td{padding:0 14px;height:56px;border-top:1px solid var(--line)}.r{text-align:right}.q{color:var(--quiet)}.nm{font-weight:600;color:#000}.code{font-size:12px;color:var(--quiet)}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.facts.col{grid-template-columns:1fr}
+.f h4{margin:0 0 6px;font-size:16px;font-weight:600}.row{display:flex;gap:12px;align-items:center;padding:9px 0;border-top:1px solid rgba(0,0,0,.08)}.row:first-of-type{border-top:0}
+.ic{width:36px;height:36px;border-radius:8px;border:1px solid rgba(0,0,0,.06);display:grid;place-items:center;flex:none;font-size:15px;color:var(--text)}
+.lb{font-size:12px;color:var(--quiet)}.vl{font-size:15px;font-weight:500;color:var(--ink)}.lk{color:var(--gdark)}.sub{font-size:12px;color:var(--quiet)}
+.scroller{max-height:380px;overflow:auto;border-radius:10px}.foot{font-size:13px;color:var(--quiet);margin-top:8px}
+.split{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;flex:1;min-height:0}.split .left{min-height:0;overflow:auto}.split .right{overflow:auto;display:flex;flex-direction:column;gap:16px}
+.split .right{gap:12px}.split .right .card{padding:12px 14px}.split .right .row{padding:5px 0}.split .right .ic{width:30px;height:30px}.split .right .vl{font-size:14px}.split .right h4{font-size:15px;margin:0 0 2px}
+.mark{position:absolute;right:16px;bottom:16px;background:rgba(0,0,0,.65);color:#fff;font-size:12px;padding:4px 10px;border-radius:10px}
+.wrap{position:relative;width:1240px}
+</style></head><body>
+<div class="intro"><h1>Goods receipt with 20 product lines</h1><p>Each sheet is a fixed 1240 × 760 window, about what a clerk sees on a laptop, so the frame shows what is visible without scrolling. The badge in the corner says what is below the fold.</p></div>
+<div id="root"></div>
+<script>
+const ITEMS=[['CUCUMBER','FV-0203','kg',45],['Beetroot','FV-0209','kg',15],['Lettuce iceberg','FV-0213','kg',60],['CARROT OOTY','FV-0201','kg',60],['Sweet potato','FV-0205','kg',30],['Tomato local','FV-0221','kg',40],['Onion big','FV-0230','kg',50],['Cabbage','FV-0218','kg',25],['Capsicum green','FV-0226','kg',12],['Beans french','FV-0233','kg',18],['Pumpkin yellow','FV-0207','kg',15],['Watermelon kiran','FV-0124','kg',40],['Banana robusta','FV-0110','dozen',20],['Papaya','FV-0131','kg',30],['Guava allahabad','FV-0120','kg',20],['Apple kinnaur','FV-0101','kg',25],['Spinach','LV-0402','bunch',30],['Coriander','LV-0410','bunch',20],['Mint','LV-0412','bunch',10],['Ginger','FV-0240','kg',5]]
+const rows=ITEMS.map((x,i)=>`<tr><td><div class="nm">${x[0]}</div><div class="code">${x[1]}</div></td><td>B26-${4024+i*7}</td><td class="q">—</td><td>${Math.max(1,Math.ceil(x[3]/25))}</td><td class="r">${x[3]} ${x[2]}</td><td class="r"><b>${i===6?x[3]-2:x[3]} ${x[2]}</b></td><td class="r" style="color:${i===6?'var(--tert)':'var(--quiet)'}">${i===6?2:0} ${x[2]}</td><td class="q">${i===6?'Damaged':'—'}</td></tr>`).join('')
+const table=(cls='')=>`<table class="${cls}"><thead><tr><th>Product</th><th>Batch</th><th>Expiry</th><th>Cont</th><th class="r">Challan qty</th><th class="r">Received qty</th><th class="r">Rejected qty</th><th>Reason</th></tr></thead><tbody>${rows}</tbody></table>`
+const compact=`<table><thead><tr><th>Product</th><th>Batch</th><th>Cont</th><th class="r">Challan</th><th class="r">Received</th><th class="r">Rejected</th></tr></thead><tbody>${ITEMS.map((x,i)=>`<tr><td><div class="nm">${x[0]}</div><div class="code">${x[1]}</div></td><td>B26-${4024+i*7}</td><td>${Math.max(1,Math.ceil(x[3]/25))}</td><td class="r">${x[3]} ${x[2]}</td><td class="r"><b>${i===6?x[3]-2:x[3]} ${x[2]}</b></td><td class="r" style="color:${i===6?'var(--tert)':'var(--quiet)'}">${i===6?'2 '+x[2]:'0 '+x[2]}</td></tr>`).join('')}</tbody></table>`
+const hd=`<div class="hd"><div class="tile">🚚</div><span class="ttl">Goods receipt</span><span class="chip">GVF-3303</span><span class="pill">To bill</span><span style="flex:1"></span><span class="btn o">History</span><span class="btn p">＋ Add invoice</span><span style="font-size:22px;color:var(--text);margin-left:6px">✕</span></div>`.replace('🚚','<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#006D35" stroke-width="1.8"><rect x="1" y="6" width="13" height="10" rx="1.5"/><path d="M14 9h4l3 3v4h-7z"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>')
+const R=(ic,l,v,s,lk)=>`<div class="row"><div class="ic">${ic}</div><div style="min-width:0"><div class="lb">${l}</div><div class="vl ${lk?'lk':''}">${v}</div>${s?`<div class="sub">${s}</div>`:''}</div></div>`
+const delivery=`<div class="card f"><h4>Delivery</h4>${R('▦','Vendor','Green Valley Farms','GSTIN 29ABGFG2093K1Z8')}${R('◷','Received','15-Oct-26, 8:10 AM','by Anand Rao')}${R('⌂','Warehouse','Rescue Kitchen')}</div>`
+const attach=`<div class="card f"><h4>Attachments</h4>${R('▤','Filed at receiving','dc-gvf-3303.jpg','1.0 MB',1)}${R('✎','Signed DC','<span style="color:var(--red)">Missing</span>','not in Diet & Kitchen · can be billed with a flag')}${R('▥','From the gate (security)','Sheet #1 · GVF-3303','',1)}</div>`
+const vehicle=`<div class="card f"><h4>Vehicle</h4>${R('▣','Vehicle','KA53M4410 · GV-26-0492','2 challans on this truck',1)}${R('☺','Driver','Manjunath · 93612 07079')}${R('⇄','At the gate','7:33 AM in · 8:37 AM out','by Manoj Yadav')}</div>`
+const prodCard=t=>`<div class="card"><div class="ch">Products · 20<span class="pill" style="background:#FFBDA833;color:var(--tert);margin-left:auto">1 line with rejected quantity</span></div>${t}</div>`
+const O=[
+ {t:'Today',w:'The table fills the first screen. Delivery, Attachments and Vehicle start about 1,000px down, so the signed DC and the vehicle need a long scroll.',
+  b:`${hd}<div class="bd">${prodCard(table())}<div class="facts">${delivery}${attach}${vehicle}</div></div>`,m:'Delivery, Attachments, Vehicle: below the fold'},
+ {t:'1 · Facts first',w:'The three boxes move above the table. They are a fixed height, so the signed DC and vehicle are always in view. The table starts lower, showing about 5 lines before the scroll.',
+  b:`${hd}<div class="bd"><div class="facts">${delivery}${attach}${vehicle}</div>${prodCard(table())}</div>`,m:'Lines 6 to 20: below the fold'},
+ {t:'2 · Table capped, scrolls inside',w:'The table shows about 6 lines in its own scroll area with the header pinned, and the boxes follow it. Two scroll areas on one sheet, which is harder to use with a trackpad.',
+  b:`${hd}<div class="bd">${prodCard(`<div class="scroller">${table()}</div><div class="foot">Showing 6 of 20 · scroll the table for more</div>`)}<div class="facts">${delivery}${attach}${vehicle}</div></div>`,m:'Vehicle box: partly below the fold'},
+ {t:'3 · Products left, facts in a right column',rec:1,w:'The facts stack in a 340px column on the right, as Naveen splits his goods-receipt edit screen. The table drops Expiry and Reason, which show in the row detail, so it fits. All three boxes and about 9 lines are visible at once, and only the table scrolls.',
+  b:`${hd}<div class="bd"><div class="split"><div class="left">${prodCard(compact)}</div><div class="right">${attach}${vehicle}${delivery}</div></div></div>`,m:'Lines 10 to 20: scroll the table'}]
+document.getElementById('root').innerHTML=O.map(o=>`<div class="opt"><h2>${o.t}${o.rec?'<span class="rec">Recommended</span>':''}</h2><p>${o.w}</p><div class="wrap"><div class="sheet">${o.b}</div><span class="mark">${o.m}</span></div></div>`).join('')
+</script></body></html>
