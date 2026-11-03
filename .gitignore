@@ -10,3 +10,6 @@ out/
 !.env.example
 .DS_Store
 *.tsbuildinfo
+
+# design decisions stay local (Sourav, 3 Nov)
+DECISIONS.md
