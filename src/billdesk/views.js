@@ -1,6 +1,6 @@
 // Which invoices each role's menu item shows, and the menu counts. Lists and counts read the same filters, so a
 // count never disagrees with its list.
-import { takenMap } from './logic'
+import { dcGrnMap, lineTakenMap, grnState } from './logic'
 
 export const exceptionsOf = (s, inv) => {
   const x = []
@@ -30,10 +30,11 @@ export const countsOf = (s, role) => {
   const n = f => s.invoices.filter(f).length
   // Finance's badge: invoices to verify
   if (role === 'finance') return { finance: n(i => ['with_finance', 'checked'].includes(i.status)) }
-  const t = takenMap(s.invoices)
+  const t = dcGrnMap(s.grns), lt = lineTakenMap(s.invoices)
   const pending = n(i => i.status === 'to_connect'), fix = n(i => i.status === 'returned_to_clerk')
-  // the clerk's work: challans to bill, invoices pending match, those sent back; the head's: invoices under review
-  if (role === 'clerk') return { challans: s.dcs.filter(d => !t[d.dcNumber]).length, invoices: pending + fix }
+  // the clerk's work: challans to group, GRNs with lines to bill, invoices pending match, those sent back; the head's:
+  // invoices under review
+  if (role === 'clerk') return { challans: s.dcs.filter(d => !t[d.dcNumber]).length, grns: (s.grns || []).filter(g => grnState(g, lt) !== 'fully').length, invoices: pending + fix }
 
   return { invoices: n(i => ['with_head', 'returned_by_finance'].includes(i.status)) }
 }

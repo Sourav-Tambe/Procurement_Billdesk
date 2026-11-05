@@ -17,7 +17,9 @@ const billDeskNavigation = () => {
   // Challans a challan and a new invoice, for Invoices an invoice's details and an invoice being edited
   const under = (p, base) => p === base || p.startsWith(`${base}/`)
   const OWNS = {
-    challans: (p, r) => under(p, '/bill-desk/challans') || under(p, '/bill-desk/dc') || (under(p, '/bill-desk/add-invoice') && !String(r.asPath).includes('edit=')),
+    challans: p => under(p, '/bill-desk/challans') || under(p, '/bill-desk/dc'),
+    // a GRN and a new invoice (made against a GRN) light GRNs (BD-72)
+    grns: (p, r) => under(p, '/bill-desk/grns') || under(p, '/bill-desk/grn') || (under(p, '/bill-desk/add-invoice') && !String(r.asPath).includes('edit=')),
     invoices: (p, r) => under(p, '/bill-desk/invoices') || under(p, '/bill-desk/invoice-details') || under(p, '/bill-desk/invoice') || (under(p, '/bill-desk/add-invoice') && String(r.asPath).includes('edit='))
   }
   if (usesIa(role)) return [
@@ -30,6 +32,7 @@ const billDeskNavigation = () => {
   const detailIsPayments = r => { const id = new URLSearchParams(String(r.asPath).split('?')[1] || '').get('id'); try { return inPayments(getState().invoices.find(i => i.id === id)) } catch { return false } }
   const FIN_OWNS = {
     challans: OWNS.challans,
+    grns: OWNS.grns,
     invoices: (p, r) => under(p, '/bill-desk/invoices') || ((under(p, '/bill-desk/invoice-details') || under(p, '/bill-desk/invoice')) && !detailIsPayments(r))
   }
 

@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import { getRole, setRole } from 'src/billdesk/roles'
 import { iaPage, movedFrom, hiddenFor, FINANCE } from 'src/billdesk/ia'
 import ClerkDesk from 'src/billdesk/screens/ClerkDesk'
+import GrnDesk from 'src/billdesk/screens/GrnDesk'
 import FinanceDesk from 'src/billdesk/screens/Finance'
 
 const SectionView = () => {
@@ -24,6 +25,7 @@ const SectionView = () => {
   if (!ready || moved) return null
   if (finance) return <FinanceDesk key={view} view={view} />
   if (!page) return 'Not a Bill Desk page'
+  if (section === 'grns') return <GrnDesk key={view} view={view} />
 
   return <ClerkDesk key={`${section}/${view}`} section={section} view={view} />
 }

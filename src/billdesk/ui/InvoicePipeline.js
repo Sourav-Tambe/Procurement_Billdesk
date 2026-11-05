@@ -12,7 +12,7 @@ import { I } from './ui'
 
 const STAGES = [
   { key: 'upload', label: 'Uploaded' },
-  { key: 'match', label: 'Challans linked' }, // not "Matched", which is also the match result (2 Nov)
+  { key: 'match', label: 'GRN linked' }, // not "Matched", which is also the match result (2 Nov); GRN since BD-72
   { key: 'review', label: 'Head review' },
   { key: 'verify', label: 'Finance check' },
   { key: 'approval', label: 'Approval' },
@@ -21,8 +21,8 @@ const STAGES = [
 // status → [index of the current stage, its state, whether it is a problem]. Correction needed sits on the head's
 // step, as in the pipeline (2 Nov); an invoice Antz AI is still reading, or failed to read, sits on Uploaded
 const NOW = {
-  to_connect: [1, 'Pending Match'],
-  draft: [1, 'Pending Match'],
+  to_connect: [1, 'Draft'],
+  draft: [1, 'Draft'],
   returned_to_clerk: [2, 'Correction Needed', true],
   with_head: [2, 'Under Review'],
   checked: [3, 'In Verification'],

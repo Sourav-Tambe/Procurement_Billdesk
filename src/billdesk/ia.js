@@ -1,4 +1,4 @@
-// Bill Desk's navigation (Sourav, 2 Nov): two sidebar items, Challans and Invoices, each a page with three L1 tabs;
+// Bill Desk's navigation (Sourav, 2 Nov): sidebar items Challans, GRNs (BD-72, 5 Nov) and Invoices, each a page with L1 tabs;
 // the same for the clerk and the head. The role changes the actions and the default view, not the menu. Finance
 // keeps its own menu until its structure is given. Each tab has its own address (/bill-desk/<section>/<tab>).
 export const IA = [
@@ -6,10 +6,23 @@ export const IA = [
     section: 'Challans',
     slug: 'challans',
     icon: 'mdi:truck-check-outline',
+    // BD-72 (5 Nov): challans are grouped into GRNs, not billed directly (were To Bill · Invoiced)
+    items: [
+      { slug: 'to-group', title: 'To Group' },
+      { slug: 'grouped', title: 'Grouped' },
+      { slug: 'all', title: 'All Challans' }
+    ]
+  },
+  {
+    // n challans → 1 GRN → 1 or n invoices (BD-72, 5 Nov); the tabs show billing only, payment stays on the invoices
+    section: 'GRNs',
+    slug: 'grns',
+    icon: 'mdi:file-document-check-outline',
     items: [
       { slug: 'to-bill', title: 'To Bill' },
-      { slug: 'invoiced', title: 'Invoiced' },
-      { slug: 'all', title: 'All Challans' }
+      { slug: 'partly-billed', title: 'Partly Billed' },
+      { slug: 'fully-billed', title: 'Fully Billed' },
+      { slug: 'all', title: 'All GRNs' }
     ]
   },
   {
@@ -17,7 +30,7 @@ export const IA = [
     slug: 'invoices',
     icon: 'mdi:receipt-text-outline',
     items: [
-      { slug: 'pending-match', title: 'Pending Match' },
+      { slug: 'pending-match', title: 'Draft' },
       { slug: 'correction-needed', title: 'Correction Needed' },
       // Submitted split in two (2 Nov: "split the listing that is under review and approved -> make approved to reviewed")
       // renamed Matched (3 Nov: "under review tab, u rename as matched"); the address stays under-review
@@ -76,7 +89,9 @@ export const listOf = (inv, role) =>
 
 // addresses from before the new navigation land on the page that replaced them
 export const movedFrom = (role, tab, hash) => {
-  if (role === 'clerk' && tab === 'dcs') return { '#on-invoice-ai': '/bill-desk/invoices/pending-match', '#on-invoice-fix': '/bill-desk/invoices/correction-needed', '#on-invoice-sent': '/bill-desk/invoices/under-review', '#on-invoice': '/bill-desk/invoices/under-review', '#all': '/bill-desk/challans/all' }[hash] || '/bill-desk/challans/to-bill'
+  // the Challans tabs renamed for GRNs (BD-72)
+  if (role === 'challans') return { 'to-bill': '/bill-desk/challans/to-group', invoiced: '/bill-desk/challans/grouped' }[tab] || null
+  if (role === 'clerk' && tab === 'dcs') return { '#on-invoice-ai': '/bill-desk/invoices/pending-match', '#on-invoice-fix': '/bill-desk/invoices/correction-needed', '#on-invoice-sent': '/bill-desk/invoices/under-review', '#on-invoice': '/bill-desk/invoices/under-review', '#all': '/bill-desk/challans/all' }[hash] || '/bill-desk/challans/to-group'
   if (role === 'clerk' || role === 'head') return '/bill-desk/invoices/under-review'
   if (role === 'invoices' && tab === 'submitted') return '/bill-desk/invoices/under-review'
   if (role === 'finance') return `/bill-desk/finance/${{ inbox: 'to-verify', approval: 'awaiting-approval', decided: 'closed' }[tab] || 'to-verify'}`

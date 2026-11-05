@@ -1,7 +1,7 @@
 // Bill Desk data in the browser (lite: no server, no DB). Two parts:
 // - the masters and DCs: a read-only snapshot of Naveen's Diet & Kitchen system (seed/dcs.json), rebuilt on every load,
 //   never saved, so a newer snapshot simply replaces it;
-// - the work: invoices, handovers, approval batches, kept in localStorage under billdesk.v1. Bill scans live in
+// - the work: GRNs, invoices, handovers, approval batches, kept in localStorage under billdesk.v1. Bill scans live in
 //   IndexedDB (ui/docStore); an invoice keeps only the scan's metadata.
 // First load (or Reset demo data) starts from sample work (sample.js), every record marked sample: true (BD-16).
 import { useSyncExternalStore } from 'react'
@@ -42,7 +42,7 @@ const buildBase = () => {
 }
 const BASE = buildBase()
 
-const blankWork = () => ({ v: 9, invoices: [], handovers: [], approvals: [], seq: { inv: 0, ho: 0, pa: 0 } })
+const blankWork = () => ({ v: 10, grns: [], invoices: [], handovers: [], approvals: [], seq: { inv: 0, ho: 0, pa: 0, grn: 0 } })
 const listeners = new Set()
 const emit = () => listeners.forEach(l => l())
 let state = null
@@ -53,7 +53,8 @@ const readWork = () => {
     if (raw) {
       const w = JSON.parse(raw)
       // v2 (31 Oct): the clerk's sample set was rebuilt; older saved work is replaced by the new sample
-      if (w && w.v === 9) {
+      // v10 (5 Nov, BD-72): GRNs between challans and invoices; older work is replaced by the new sample
+      if (w && w.v === 10) {
         // work saved before multi-document invoices had a single billDoc
         w.invoices.forEach(i => { if (!i.docs) { i.docs = i.billDoc ? [i.billDoc] : []; delete i.billDoc } })
 
@@ -90,7 +91,7 @@ export const useBillDesk = () => useSyncExternalStore(subscribe, load, () => SER
 // apply a change to a copy of the work and keep it; fn returns a value for the caller (or throws to refuse)
 export const commit = fn => {
   const cur = load()
-  const work = JSON.parse(JSON.stringify({ v: 9, invoices: cur.invoices, handovers: cur.handovers, approvals: cur.approvals, seq: cur.seq }))
+  const work = JSON.parse(JSON.stringify({ v: 10, grns: cur.grns, invoices: cur.invoices, handovers: cur.handovers, approvals: cur.approvals, seq: cur.seq }))
   const out = fn(work, BASE)
   save(work)
   state = { ...BASE, ...work }
@@ -110,3 +111,4 @@ export const vendorOf = (s, id) => s.vendors.find(v => v.id === id)
 export const itemOf = (s, id) => s.items.find(i => i.id === id)
 export const unitOf = (s, id) => s.units.find(u => u.id === id)?.symbol || ''
 export const whOf = (s, id) => s.warehouses.find(w => w.id === id)?.name || id
+export const grnOf = (s, id) => (s.grns || []).find(g => g.id === id)

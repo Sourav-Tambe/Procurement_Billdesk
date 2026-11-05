@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GRN information architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EFF5F2;--text:#44544A;--quiet:#7A8684;--line:#DAE7DF;--outline:#C3CEC7;--green:#37BD69;--gdark:#006D35;--tint:#E8F4F2;--ink:#1F415B;--navy:#1F415B;--tert:#FA6140;--tert20:#FFBDA833;--err:#E93353;--errbg:#FFD3D3;--notes:#FCF4AE;--amber:#B26A00;--sec:#dff9f7;--n05:rgba(0,0,0,.05)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,sans-serif;color:var(--text);padding:32px;font-size:14px}
+h1{font-size:24px;font-weight:600;margin:0 0 6px;color:#000}.lead{margin:0 0 28px;color:var(--quiet);max-width:900px}
+h2{font-size:18px;font-weight:600;margin:0 0 4px;color:#000}.sub{color:var(--quiet);margin:0 0 16px}
+section{margin-bottom:40px}
+.box{background:#fff;border-radius:12px;padding:24px}
+/* chain map */
+.chain{display:grid;grid-template-columns:1fr 64px 1fr 64px 1fr;align-items:center}
+.col h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--quiet);margin:0 0 10px}
+.rec{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fff}
+.rec b{color:#000;font-weight:600}.rec .q{display:block;margin-top:2px}
+.rec.grn{border:2px solid var(--green);background:#F2FFF8}
+.arrow{text-align:center;color:var(--quiet);font-size:12px;line-height:1.3}.arrow i{display:block;font-style:normal;font-size:22px;color:var(--green)}
+.lines{margin-top:10px;display:grid;gap:4px}.ln{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:4px 8px;border-radius:6px;background:var(--n05)}
+.ln.a{background:var(--tint)}.ln.b{background:var(--notes)}
+.q{color:var(--quiet);font-size:12px}
+.rule{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.rule span{background:var(--n05);border-radius:16px;padding:6px 12px;font-size:13px}
+/* journey */
+.jt{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.jt th{background:var(--tint);text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:0 14px;height:44px;color:var(--ink)}
+.jt td{padding:12px 14px;border-top:1px solid var(--line);vertical-align:middle}
+.jt td:first-child{color:#000;font-weight:500;width:34%}
+.pill{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;font-size:12px;font-weight:600;white-space:nowrap}
+.p-grey{background:var(--n05)}.p-ok{background:var(--tint);color:var(--gdark)}.p-chk{background:var(--notes);color:var(--amber)}.p-bad{background:var(--errbg);color:var(--err)}.p-warn{background:var(--tert20);color:var(--tert)}.p-info{background:var(--sec);color:var(--ink)}
+.dash{color:var(--outline)}
+/* switches */
+.sw{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:14px}
+.sw .lab{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--quiet);margin-right:4px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{height:34px;padding:0 14px;border-radius:17px;border:1px solid var(--outline);display:flex;align-items:center;background:#fff;cursor:pointer;font:inherit;color:var(--text)}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+/* app frame */
+.app{display:grid;grid-template-columns:240px 1fr;background:var(--bg);border-radius:12px;overflow:hidden;border:1px solid var(--line);min-height:640px}
+.nav{background:#fff;padding:18px 12px;border-right:1px solid var(--line)}
+.brand{font-weight:600;color:#000;padding:4px 12px 18px;font-size:16px}
+.nav .grp{font-size:12px;color:var(--quiet);text-transform:uppercase;letter-spacing:.4px;padding:10px 12px 6px}
+.ni{display:flex;align-items:center;gap:10px;height:42px;padding:0 12px;border-radius:8px;font-weight:600;color:var(--text);cursor:pointer;margin-bottom:2px}
+.ni .ic{width:18px;height:18px;border-radius:4px;border:2px solid currentColor;opacity:.7}
+.ni.on{background:var(--green);color:#fff}
+.ni .new{margin-left:auto;font-size:11px;background:var(--tert20);color:var(--tert);border-radius:10px;padding:2px 8px}
+.ni.on .new{background:rgba(255,255,255,.25);color:#fff}
+.ni .vo{margin-left:auto;font-size:11px;font-weight:500;color:var(--quiet)}.ni.on .vo{color:#fff}
+.main{padding:24px 28px;position:relative}
+.crumb{color:var(--quiet);margin-bottom:14px}.crumb b{color:#000;font-weight:400}
+.page{background:#fff;border-radius:12px;padding:24px}
+.ph{display:flex;align-items:center;gap:12px}.ph h3{font-size:24px;font-weight:500;margin:0;flex:1;color:var(--text)}
+.add{background:var(--green);color:#fff;height:40px;padding:0 18px;border-radius:8px;display:inline-flex;align-items:center;gap:8px;font-size:16px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;border:0;font-family:inherit}
+.l1{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:18px 0}.l1 span{padding:12px 18px;font-size:16px;color:var(--quiet);white-space:nowrap}.l1 .on{color:var(--green);border-bottom:2px solid var(--green);font-weight:500}
+.tb{display:flex;align-items:center;gap:12px;margin-bottom:16px}.s{width:300px;height:40px;border:1px solid var(--outline);border-radius:4px;display:flex;align-items:center;padding:0 12px;color:#9aa}.sp{flex:1}.dd{height:40px;min-width:170px;border:1px solid var(--outline);border-radius:4px;display:flex;align-items:center;justify-content:space-between;padding:0 12px}.dd::after{content:'▾';color:var(--quiet)}
+table.g{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+table.g th{background:var(--tint);text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:0 14px;height:48px;color:var(--ink);white-space:nowrap}
+table.g td{padding:12px 14px;border-top:1px solid var(--line);vertical-align:middle;height:64px}
+table.g tr.sel td{background:#F2FFF8}
+.r{text-align:right}.bb{font-weight:600;color:#000}
+.cb{width:18px;height:18px;border:2px solid var(--outline);border-radius:3px;display:inline-block;vertical-align:middle}.cb.on{background:var(--green);border-color:var(--green);position:relative}.cb.on::after{content:'';position:absolute;left:4px;top:0;width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.cb.dis{background:var(--n05);border-color:var(--line)}
+.who{display:flex;align-items:center;gap:10px}.av{width:32px;height:32px;border-radius:50%;background:var(--n05);display:grid;place-items:center;font-size:12px;font-weight:600}
+.prog{display:flex;align-items:center;gap:8px}.bar{display:flex;gap:2px}.bar i{display:block;width:16px;height:6px;border-radius:3px;background:var(--line)}.bar i.d{background:var(--green)}
+.selbar{position:sticky;bottom:0;margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 -4px 16px rgba(0,0,0,.06);display:flex;align-items:center;gap:16px;padding:12px 16px}
+.selbar .t{flex:1}.selbar b{color:#000}
+.ghost{height:40px;padding:0 16px;border:1px solid var(--outline);border-radius:8px;display:inline-flex;align-items:center;color:var(--green);font-size:16px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;background:#fff;font-family:inherit}
+.warnline{color:var(--err);font-size:13px;margin-top:8px}
+/* sheet */
+.sheetwrap{display:grid;grid-template-columns:1fr 560px;gap:0;min-height:600px}
+.dim{background:rgba(31,65,91,.25);border-radius:12px 0 0 12px}
+.sheet{background:#fff;border-radius:0 12px 12px 0;padding:22px 24px;box-shadow:-8px 0 24px rgba(0,0,0,.08)}
+.sh{display:flex;align-items:flex-start;gap:10px}.sh h4{margin:0;font-size:20px;font-weight:500;color:#000;flex:1}.x{width:32px;height:32px;border-radius:50%;background:var(--n05);display:grid;place-items:center}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;padding:14px;border-radius:10px;background:var(--bg)}.kv div span{display:block;font-size:12px;color:var(--quiet)}.kv div b{color:#000;font-weight:500}
+.sect{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--quiet);margin:18px 0 10px}
+.dccards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.dcc{border:1px solid var(--line);border-radius:8px;padding:10px}.dcc b{display:block;color:#000;font-weight:500;font-size:13px}
+.actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+/* form */
+.fcard{background:#fff;border-radius:12px;padding:20px 24px;margin-bottom:14px}
+.fcard h5{margin:0 0 14px;font-size:16px;font-weight:600;color:#000;display:flex;align-items:center;gap:10px}.fcard h5 .n{width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:12px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}.fld{border:1px solid var(--outline);border-radius:4px;height:48px;padding:6px 12px;position:relative}.fld span{position:absolute;top:-9px;left:10px;background:#fff;padding:0 4px;font-size:12px;color:var(--quiet)}.fld b{font-weight:400;color:#000;line-height:34px}.fld.lock{background:var(--n05)}
+.note{font-size:13px;color:var(--quiet);margin-top:10px}
+.callout{background:var(--tint);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--gdark);margin-top:12px}
+.role{position:absolute;top:18px;right:24px;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:13px}
+.hide{display:none!important}
+.dec{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.dec div{background:#fff;border-radius:10px;padding:14px}.dec b{display:block;color:#000;font-weight:600;margin-bottom:4px}
+</style></head><body>
+
+<h1>Bill Desk with GRNs</h1>
+<p class="lead">n challans go into 1 GRN, and 1 GRN is billed by 1 or n invoices. The example below uses real challans from the Diet &amp; Kitchen snapshot. Every invoice step after saving stays as it is today.</p>
+
+<section>
+  <h2>What's decided</h2>
+  <p class="sub">Your answers from this session.</p>
+  <div class="dec">
+    <div><b>The clerk makes the GRN</b>On Challans, the clerk ticks challans and clicks Make GRN.</div>
+    <div><b>One vendor per GRN</b>A selection with two vendors is refused.</div>
+    <div><b>Whole item lines</b>Each GRN item line goes on exactly one invoice.</div>
+    <div><b>Matched per invoice</b>Each invoice goes to the head on save, as today.</div>
+  </div>
+</section>
+
+<section>
+  <h2>1. How the records connect</h2>
+  <p class="sub">Example: three Sri Lakshmi Agro Foods challans at Rescue Kitchen.</p>
+  <div class="box">
+    <div class="chain">
+      <div class="col"><h3>Challans (n)</h3>
+        <div class="rec"><b>SLA/2610/3797</b><span class="q">10 Oct · Carrot Ooty 30 kg, Pumpkin 15 kg, Banana 40 kg</span></div>
+        <div class="rec"><b>SLA/2610/3805</b><span class="q">12 Oct · Apple Kinnaur 40 kg</span></div>
+        <div class="rec"><b>SLA/2610/3809</b><span class="q">12 Oct · Guava Allahabad 36 kg</span></div>
+      </div>
+      <div class="arrow"><i>&rarr;</i>Make GRN</div>
+      <div class="col"><h3>GRN (1)</h3>
+        <div class="rec grn"><b>GRN-26-0004</b><span class="q">Sri Lakshmi Agro Foods · 3 challans · 5 item lines</span>
+          <div class="lines">
+            <div class="ln a"><span>Carrot Ooty · 30 kg</span><span>Invoice A</span></div>
+            <div class="ln a"><span>Pumpkin Yellow · 15 kg</span><span>Invoice A</span></div>
+            <div class="ln a"><span>Banana Robusta · 40 kg</span><span>Invoice A</span></div>
+            <div class="ln b"><span>Apple Kinnaur · 40 kg</span><span>Invoice B</span></div>
+            <div class="ln b"><span>Guava Allahabad · 36 kg</span><span>Invoice B</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="arrow"><i>&rarr;</i>Add invoice<br>(pick lines)</div>
+      <div class="col"><h3>Invoices (1 or n)</h3>
+        <div class="rec" style="border-color:var(--green)"><b>A · SLA/INV/1182</b><span class="q">BD-26-0031 · 3 lines · Matched → head</span></div>
+        <div class="rec" style="border-color:var(--amber);background:#FFFCE8"><b>B · SLA/INV/1190</b><span class="q">BD-26-0034 · 2 lines · Correction needed</span></div>
+        <div class="rec" style="border-style:dashed;color:var(--quiet)">or one invoice for all 5 lines</div>
+      </div>
+    </div>
+    <div class="rule">
+      <span>A challan belongs to one GRN</span>
+      <span>A GRN line belongs to one invoice</span>
+      <span>Challans can change only while no line is billed</span>
+      <span>Deleting an invoice frees its lines back to the GRN</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>2. Where each record sits, step by step</h2>
+  <p class="sub">The tab each record moves to after each step.</p>
+  <table class="jt">
+    <tr><th>Step</th><th>Challan tab</th><th>GRN tab</th><th>Invoice tab</th></tr>
+    <tr><td>Challan arrives from Diet &amp; Kitchen</td><td><span class="pill p-grey">To Group</span></td><td class="dash">—</td><td class="dash">—</td></tr>
+    <tr><td>Clerk ticks 3 challans → Make GRN</td><td><span class="pill p-ok">Grouped</span></td><td><span class="pill p-grey">To Bill</span></td><td class="dash">—</td></tr>
+    <tr><td>Invoice A on 3 of 5 lines</td><td><span class="pill p-ok">Grouped</span></td><td><span class="pill p-chk">Partly Billed · 3 of 5</span></td><td><span class="pill p-grey">Matched</span></td></tr>
+    <tr><td>Invoice B on the last 2 lines</td><td><span class="pill p-ok">Grouped</span></td><td><span class="pill p-ok">Fully Billed</span></td><td><span class="pill p-warn">Correction Needed</span></td></tr>
+    <tr><td>B deleted for a corrected bill</td><td><span class="pill p-ok">Grouped</span></td><td><span class="pill p-chk">Partly Billed · 3 of 5</span></td><td class="dash">gone</td></tr>
+    <tr><td>Head reviews, Finance pays (unchanged)</td><td>no change</td><td>no change</td><td><span class="pill p-info">In Verification</span> → <span class="pill p-ok">Paid</span></td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>3. The screens</h2>
+  <p class="sub">Use the chips to switch role and screen. GRNs is the new sidebar item between Challans and Invoices.</p>
+  <div class="sw">
+    <div class="chips"><span class="lab">Role</span>
+      <button class="chip on" data-role="clerk">Clerk</button><button class="chip" data-role="head">Head</button><button class="chip" data-role="finance">Finance</button></div>
+    <div class="chips"><span class="lab">Screen</span>
+      <button class="chip on" data-scr="challans">Challans › To Group</button><button class="chip" data-scr="grns">GRNs › Partly Billed</button><button class="chip" data-scr="sheet">GRN sheet</button><button class="chip" data-scr="form">Add invoice</button></div>
+  </div>
+
+  <div class="app">
+    <nav class="nav">
+      <div class="brand">Antz · Bill Desk</div>
+      <div class="grp">Bill Desk</div>
+      <div class="ni" data-nav="challans"><span class="ic"></span>Challans<span class="vo rv">view</span></div>
+      <div class="ni" data-nav="grns"><span class="ic"></span>GRNs<span class="new">new</span></div>
+      <div class="ni" data-nav="invoices"><span class="ic"></span>Invoices<span class="vo fv">view</span></div>
+      <div class="ni fin"><span class="ic"></span>Payments</div>
+      <div class="ni fin"><span class="ic"></span>Data Explorer</div>
+    </nav>
+    <div class="main">
+      <div class="role">Viewing as <b id="roleName">Clerk</b></div>
+
+      <!-- Challans › To Group -->
+      <div data-view="challans">
+        <div class="crumb">Bill Desk / <b>Challans</b></div>
+        <div class="page">
+          <div class="ph"><h3>Challans</h3></div>
+          <div class="l1"><span class="on">To Group (14)</span><span>Grouped (38)</span><span>All Challans (52)</span></div>
+          <div class="tb"><div class="s">Search challan or vendor</div><div class="sp"></div><div class="dd">Sri Lakshmi Agro Foods</div><div class="dd">1 Oct – 15 Oct</div></div>
+          <table class="g">
+            <tr><th class="clerk-only"><span class="cb"></span></th><th>Challan no.</th><th>Vendor</th><th>Received</th><th>Warehouse</th><th>Items</th><th>Signed DC</th><th>GRN</th></tr>
+            <tr class="sel"><td class="clerk-only"><span class="cb on"></span></td><td class="bb">SLA/2610/3797</td><td>Sri Lakshmi Agro Foods</td><td>10 Oct 26</td><td>Rescue Kitchen</td><td>3</td><td><span class="pill p-ok">Sealed</span></td><td><span class="pill p-grey">To Group</span></td></tr>
+            <tr class="sel"><td class="clerk-only"><span class="cb on"></span></td><td class="bb">SLA/2610/3805</td><td>Sri Lakshmi Agro Foods</td><td>12 Oct 26</td><td>Rescue Kitchen</td><td>1</td><td><span class="pill p-ok">Sealed</span></td><td><span class="pill p-grey">To Group</span></td></tr>
+            <tr class="sel"><td class="clerk-only"><span class="cb on"></span></td><td class="bb">SLA/2610/3809</td><td>Sri Lakshmi Agro Foods</td><td>12 Oct 26</td><td>Rescue Kitchen</td><td>1</td><td><span class="pill p-bad">Missing</span></td><td><span class="pill p-grey">To Group</span></td></tr>
+            <tr><td class="clerk-only"><span class="cb"></span></td><td class="bb">SLA/2610/3818</td><td>Sri Lakshmi Agro Foods</td><td>14 Oct 26</td><td>Rescue Kitchen</td><td>2</td><td><span class="pill p-ok">Sealed</span></td><td><span class="pill p-grey">To Group</span></td></tr>
+            <tr><td class="clerk-only"><span class="cb"></span></td><td class="bb">SLA/2610/3823</td><td>Sri Lakshmi Agro Foods</td><td>15 Oct 26</td><td>Rescue Kitchen</td><td>2</td><td><span class="pill p-ok">Sealed</span></td><td><span class="pill p-grey">To Group</span></td></tr>
+          </table>
+          <div class="selbar clerk-only"><div class="t"><b>3 challans selected</b><div class="q">Sri Lakshmi Agro Foods · 5 item lines</div></div><button class="ghost">Clear</button><button class="add">Make GRN</button></div>
+          <div class="warnline clerk-only">If two vendors are ticked, Make GRN is off and a line reads: "A GRN holds one vendor's challans."</div>
+        </div>
+      </div>
+
+      <!-- GRNs › Partly Billed -->
+      <div data-view="grns" class="hide">
+        <div class="crumb">Bill Desk / <b>GRNs</b></div>
+        <div class="page">
+          <div class="ph"><h3>GRNs</h3></div>
+          <div class="l1"><span>To Bill (4)</span><span class="on">Partly Billed (2)</span><span>Fully Billed (11)</span><span>All GRNs (17)</span></div>
+          <div class="tb"><div class="s">Search GRN, challan or vendor</div><div class="sp"></div><div class="dd">All vendors</div><div class="dd">1 Oct – 15 Oct</div></div>
+          <table class="g">
+            <tr><th>GRN no.</th><th>Vendor</th><th>Challans</th><th>Warehouse</th><th>Lines billed</th><th>Invoices</th><th>Created</th></tr>
+            <tr><td class="bb">GRN-26-0004</td><td>Sri Lakshmi Agro Foods</td><td>3<div class="q">SLA/2610/3797 +2</div></td><td>Rescue Kitchen</td><td><div class="prog"><span class="bar"><i class="d"></i><i class="d"></i><i class="d"></i><i></i><i></i></span>3 of 5</div></td><td>1</td><td><div class="who"><span class="av">RK</span><div>Ravi Kumar<div class="q">13 Oct 26</div></div></div></td></tr>
+            <tr><td class="bb">GRN-26-0002</td><td>Annapurna Fruit Mart</td><td>4<div class="q">AFM/1026/551 +3</div></td><td>Main Kitchen</td><td><div class="prog"><span class="bar"><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i></i><i></i></span>4 of 6</div></td><td>2</td><td><div class="who"><span class="av">RK</span><div>Ravi Kumar<div class="q">8 Oct 26</div></div></div></td></tr>
+          </table>
+          <p class="note">A GRN's tabs show billing only. Payment progress stays on Invoices and Payments, so it isn't repeated here.</p>
+        </div>
+      </div>
+
+      <!-- GRN sheet -->
+      <div data-view="sheet" class="hide">
+        <div class="sheetwrap">
+          <div class="dim"></div>
+          <div class="sheet">
+            <div class="sh"><div style="flex:1"><h4>GRN-26-0004</h4><div class="q">Sri Lakshmi Agro Foods · Rescue Kitchen</div></div><span class="pill p-chk">Partly Billed · 3 of 5</span><span class="x">✕</span></div>
+            <div class="kv"><div><span>Challans</span><b>3</b></div><div><span>Created</span><b>13 Oct 26 · Ravi Kumar</b></div><div><span>Invoices</span><b>1</b></div></div>
+            <div class="sect">Challans</div>
+            <div class="dccards">
+              <div class="dcc"><b>SLA/2610/3797</b><span class="q">10 Oct · 3 items</span></div>
+              <div class="dcc"><b>SLA/2610/3805</b><span class="q">12 Oct · 1 item</span></div>
+              <div class="dcc"><b>SLA/2610/3809</b><span class="q">12 Oct · 1 item · <span style="color:var(--err)">unsigned</span></span></div>
+            </div>
+            <div class="sect">Item lines</div>
+            <table class="g">
+              <tr><th>Item</th><th class="r">Received</th><th>Invoice</th></tr>
+              <tr><td>Carrot Ooty</td><td class="r">30 kg</td><td><span class="bb">SLA/INV/1182</span><div class="q">BD-26-0031 · Matched</div></td></tr>
+              <tr><td>Pumpkin Yellow</td><td class="r">15 kg</td><td><span class="bb">SLA/INV/1182</span><div class="q">BD-26-0031 · Matched</div></td></tr>
+              <tr><td>Banana Robusta</td><td class="r">40 kg</td><td><span class="bb">SLA/INV/1182</span><div class="q">BD-26-0031 · Matched</div></td></tr>
+              <tr><td>Apple Kinnaur</td><td class="r">40 kg</td><td><span class="pill p-grey">Not billed</span></td></tr>
+              <tr><td>Guava Allahabad</td><td class="r">36 kg</td><td><span class="pill p-grey">Not billed</span></td></tr>
+            </table>
+            <div class="actions clerk-only"><button class="ghost" disabled style="opacity:.4">Edit challans</button><button class="add">+ Add invoice</button></div>
+            <p class="note clerk-only">Edit challans and Delete GRN only work while the GRN is To Bill. Once a line is billed, its challans are locked.</p>
+            <p class="note view-only">View only. Only the clerk adds invoices.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add invoice -->
+      <div data-view="form" class="hide">
+        <div class="crumb">Bill Desk / Invoices / <b>Add invoice</b></div>
+        <div class="fcard"><h5><span class="n">1</span>Invoice</h5>
+          <div class="fields"><div class="fld"><span>Invoice no.*</span><b>SLA/INV/1190</b></div><div class="fld"><span>Invoice date*</span><b>16 Oct 26</b></div><div class="fld lock"><span>Vendor (from the GRN)</span><b>Sri Lakshmi Agro Foods</b></div><div class="fld"><span>Attachments*</span><b>SLA-INV-1190.pdf</b></div></div>
+        </div>
+        <div class="fcard"><h5><span class="n">2</span>GRN</h5>
+          <div class="fields"><div class="fld"><span>GRN*</span><b>GRN-26-0004 · 3 challans · 2 lines left</b></div><div></div></div>
+          <p class="note">Only GRNs with lines left to bill are listed. The challans are shown here read-only.</p>
+        </div>
+        <div class="fcard"><h5><span class="n">3</span>Items on this invoice</h5>
+          <table class="g">
+            <tr><th style="width:40px"><span class="cb on"></span></th><th>Item</th><th class="r">Received</th><th class="r">Billed</th><th class="r">Rate</th><th class="r">GST</th><th class="r">Amount</th></tr>
+            <tr class="sel"><td><span class="cb on"></span></td><td>Apple Kinnaur</td><td class="r">40 kg</td><td class="r">40</td><td class="r">₹140</td><td class="r">0%</td><td class="r">₹5,600</td></tr>
+            <tr class="sel"><td><span class="cb on"></span></td><td>Guava Allahabad</td><td class="r">36 kg</td><td class="r" style="color:var(--tert)">40</td><td class="r">₹90</td><td class="r">0%</td><td class="r">₹3,600</td></tr>
+            <tr><td><span class="cb dis"></span></td><td style="color:var(--quiet)">Carrot Ooty, Pumpkin Yellow, Banana Robusta</td><td colspan="5" class="q">On SLA/INV/1182 (BD-26-0031)</td></tr>
+          </table>
+          <div class="callout">Untick a line to leave it for a later invoice. Billed against received is checked per line, as today. Guava shows 40 billed against 36 received, so this invoice goes to Correction Needed.</div>
+        </div>
+        <div class="actions"><button class="ghost">Cancel</button><button class="add">Save invoice</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>4. Sidebar and tabs per role</h2>
+  <table class="jt">
+    <tr><th>Role</th><th>Sidebar</th><th>Lands on</th><th>Can act on GRNs</th></tr>
+    <tr><td>Clerk</td><td>Challans · <b>GRNs</b> · Invoices</td><td>Challans › To Group</td><td>Make, edit while To Bill, delete while To Bill, add invoice</td></tr>
+    <tr><td>Head</td><td>Challans · <b>GRNs</b> · Invoices</td><td>Invoices › Matched (as now)</td><td>View only</td></tr>
+    <tr><td>Finance</td><td>Challans · <b>GRNs</b> · Invoices · Payments · Data Explorer</td><td>Payments › To Verify (as now)</td><td>View only</td></tr>
+  </table>
+  <p class="sub" style="margin-top:12px">Tabs: Challans is To Group · Grouped · All Challans (renamed from To Bill · Invoiced). GRNs is To Bill · Partly Billed · Fully Billed · All GRNs. Invoices and Payments keep their tabs, and Invoices gains a GRN column.</p>
+</section>
+
+<script>
+let role='clerk',scr='challans';
+const navOf={challans:'challans',grns:'grns',sheet:'grns',form:'invoices'};
+function draw(){
+  document.querySelectorAll('[data-view]').forEach(v=>v.classList.toggle('hide',v.dataset.view!==scr));
+  document.querySelectorAll('[data-nav]').forEach(n=>n.classList.toggle('on',n.dataset.nav===navOf[scr]));
+  document.querySelectorAll('.fin').forEach(n=>n.classList.toggle('hide',role!=='finance'));
+  document.querySelectorAll('.rv').forEach(n=>n.classList.toggle('hide',role==='clerk'));
+  document.querySelectorAll('.fv').forEach(n=>n.classList.toggle('hide',role!=='finance'));
+  document.querySelectorAll('.clerk-only').forEach(n=>n.classList.toggle('hide',role!=='clerk'));
+  document.querySelectorAll('.view-only').forEach(n=>n.classList.toggle('hide',role==='clerk'));
+  document.getElementById('roleName').textContent=role[0].toUpperCase()+role.slice(1);
+  const formChip=document.querySelector('[data-scr="form"]');formChip.classList.toggle('hide',role!=='clerk');
+  if(role!=='clerk'&&scr==='form'){scr='sheet';draw();}
+  document.querySelectorAll('[data-role]').forEach(c=>c.classList.toggle('on',c.dataset.role===role));
+  document.querySelectorAll('[data-scr]').forEach(c=>c.classList.toggle('on',c.dataset.scr===scr));
+}
+document.querySelectorAll('[data-role]').forEach(c=>c.onclick=()=>{role=c.dataset.role;draw()});
+document.querySelectorAll('[data-scr]').forEach(c=>c.onclick=()=>{scr=c.dataset.scr;draw()});
+draw();
+</script>
+</body></html>

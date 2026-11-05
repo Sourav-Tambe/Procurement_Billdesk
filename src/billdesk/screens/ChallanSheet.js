@@ -1,6 +1,6 @@
 // One delivery challan as a sheet over the list: Naveen's goods-receipt screen, one to one (Sourav, 31 Oct: "use the
 // same screen that Naveen has"). Header with the tile, the number as a chip, the stage, History and the Bill Desk
-// action (Add invoice when free, Open the invoice when on one; Edit and the print buttons are his, not ours). Left,
+// action (Make GRN when on no GRN, Open the GRN when on one, BD-72; Edit and the print buttons are his, not ours). Left,
 // the Products table with batch, expiry, containers and the quantities. Right, his cards: Delivery, Attachments,
 // Vehicle, then a Bill Desk card with the stamp and where the DC is now. Fields the snapshot lacks come from
 // seed/extras.js and are shown as present until the refresh step pulls the real ones.
@@ -9,10 +9,10 @@ import { Box, ButtonBase, Dialog, IconButton } from '@mui/material'
 import { DocViewer } from '../ui/DocTiles'
 import { challanSvg } from '../sample'
 import CommonDialogBox from 'src/components/CommonDialogBox'
-import { useBillDesk, vendorOf, itemOf, unitOf, whOf } from '../store'
+import { useBillDesk, vendorOf, itemOf, unitOf, whOf, grnOf } from '../store'
 import { takenDcs } from '../flow'
 import { extrasOf } from '../seed/extras'
-import { fmtAt } from '../logic'
+import { fmtAt, lineTakenMap, grnState, grnInvoiceIds, GRN_STATE } from '../logic'
 import { C, T, Txt, I, Btn } from '../ui/ui'
 import { Pill, StagePill, Grid, Stamp, SignedDc, AddBtn } from '../ui/parts'
 import { statusPill } from './Invoice'
@@ -45,9 +45,10 @@ const Row = ({ icon, color, tile, label, children, sub }) => (
 const Plate = ({ no }) => <Box sx={{ width: 40, height: 40, borderRadius: '8px', bgcolor: '#2b2b2b', display: 'grid', placeItems: 'center', flexShrink: 0 }}><Box sx={{ bgcolor: '#f5e6a3', color: '#222', fontSize: 7, fontWeight: 700, px: '4px', borderRadius: '2px', letterSpacing: '0.3px', textAlign: 'center', lineHeight: 1.3 }}>{no.replace(/^(KA)(\d\d)(\D+)(\d+)$/, '$1 $2 $3\n$4').split('\n').map((p, i) => <div key={i}>{p}</div>)}</Box></Box>
 const GateThumb = () => <Box sx={{ width: 40, height: 40, borderRadius: '8px', border: `1px solid ${C.n10}`, bgcolor: C.white, display: 'grid', placeItems: 'center', flexShrink: 0 }}><Box component='svg' viewBox='0 0 40 40' sx={{ width: 32, height: 32 }}><rect x='6' y='4' width='28' height='32' fill='#fff' stroke='#999' /><rect x='10' y='9' width='12' height='2' fill='#555' /><rect x='10' y='14' width='20' height='1.5' fill='#aaa' /><rect x='10' y='18' width='20' height='1.5' fill='#aaa' /><rect x='10' y='22' width='14' height='1.5' fill='#aaa' /><rect x='10' y='26' width='20' height='1.5' fill='#aaa' /><rect x='10' y='30' width='9' height='1.5' fill='#aaa' /></Box></Box>
 
-// what happened to this DC in Bill Desk: the receipt, then every trail event on an invoice that names it
+// what happened to this DC in Bill Desk: the receipt, its GRN, then every trail event on an invoice that names it
 const historyOf = (s, d) => {
   const rows = [{ at: d.receivedAt, by: d.receivedBy, what: `Received at ${whOf(s, d.warehouseId)} · Diet & Kitchen` }]
+  ;(s.grns || []).forEach(g => { if (g.dcNumbers.includes(d.dcNumber)) g.trail.forEach(e => rows.push({ at: e.at, by: e.by, what: `${e.action} · ${g.id}${e.note ? ` · ${e.note}` : ''}` })) })
   s.invoices.forEach(inv => { if (inv.dcNumbers.includes(d.dcNumber)) inv.trail.forEach(e => rows.push({ at: e.at, by: e.by, what: `${e.action} · ${inv.id}${e.note ? ` · ${e.note}` : ''}` })) })
 
   return rows.sort((a, b) => (b.at || '').localeCompare(a.at || ''))
@@ -59,7 +60,7 @@ const Link = ({ onClick, children }) => (
 )
 const gateSvg = (d, label) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="420" viewBox="0 0 600 420" font-family="Courier New, monospace" font-size="13" fill="#222"><rect width="600" height="420" fill="#F7F7F2"/><text x="40" y="48" font-size="18" font-weight="bold">GATE ENTRY SHEET</text><text x="40" y="74">${label}</text><line x1="40" y1="96" x2="560" y2="96" stroke="#222"/>${[0, 1, 2, 3, 4, 5].map(i => `<line x1="40" y1="${130 + i * 40}" x2="560" y2="${130 + i * 40}" stroke="#bbb"/>`).join('')}<text x="40" y="122">${d.dcNumber}</text><text x="40" y="400" font-size="11" fill="#666">Security · sample sheet</text></svg>`)}`
 
-const ChallanSheet = ({ dc, onClose, onAddInvoice, onOpenInvoice }) => {
+const ChallanSheet = ({ dc, onClose, onMakeGrn, onOpenGrn }) => {
   const s = useBillDesk()
   const [hist, setHist] = useState(false)
   // clicks from Naveen's goods receipt (Sourav, 2 Nov): a file opens the paper, the vehicle opens the truck visit, a
@@ -71,7 +72,10 @@ const ChallanSheet = ({ dc, onClose, onAddInvoice, onOpenInvoice }) => {
   const d = cur ? s.dcsBy[cur] : null
   if (!d) return null
   const vendor = vendorOf(s, d.vendorId)
-  const inv = s.invoices.find(i => i.id === takenDcs(s)[d.dcNumber])
+  const grn = grnOf(s, takenDcs(s)[d.dcNumber])
+  const lt = lineTakenMap(s.invoices)
+  const grnPill = g => { const [l, tone] = GRN_STATE[grnState(g, lt)]; return <Pill tone={tone}>{l}</Pill> }
+  const grnInvs = grn ? grnInvoiceIds(grn, lt).map(id => s.invoices.find(i => i.id === id)).filter(Boolean) : []
   const x = extrasOf(d)
   const docs = [
     { id: 'recv', kind: 'challan', name: x.receivingFile.name, type: 'image/svg+xml', url: challanSvg({ ...d, signedDc: false }, s), by: d.receivedBy, at: d.receivedAt },
@@ -103,12 +107,12 @@ const ChallanSheet = ({ dc, onClose, onAddInvoice, onOpenInvoice }) => {
             <Box sx={{ width: 40, height: 40, borderRadius: '8px', bgcolor: C.tint, display: 'grid', placeItems: 'center' }}><I i='mdi:truck-check-outline' s={22} c={C.greenDark} /></Box>
             <Txt sx={{ fontSize: 20, fontWeight: 500, lineHeight: '24px' }} c={C.text}>Goods receipt</Txt>
             <Box sx={{ bgcolor: C.n05, color: C.ink, ...T.minorMedium, px: '10px', py: '4px', borderRadius: '6px' }}>{d.dcNumber}</Box>
-            {inv ? statusPill(inv) : <StagePill label='To Bill' />}
+            {grn ? grnPill(grn) : <StagePill label='To Group' />}
             <Box sx={{ flex: 1 }} />
             <Btn icon='mdi:history' onClick={() => setHist(true)} sx={{ height: 40 }}>History</Btn>
-            {inv
-              ? onOpenInvoice && <Btn kind='pri' icon='mdi:receipt-text-outline' onClick={() => onOpenInvoice(inv.id)} sx={{ height: 40 }}>Open {inv.invoiceNo || inv.id}</Btn>
-              : onAddInvoice && <Btn kind='pri' icon='mdi:plus' onClick={() => onAddInvoice(d)} sx={{ height: 40 }}>Add invoice</Btn>}
+            {grn
+              ? onOpenGrn && <Btn kind='pri' icon='mdi:file-document-check-outline' onClick={() => onOpenGrn(grn.id)} sx={{ height: 40 }}>Open {grn.id}</Btn>
+              : onMakeGrn && <Btn kind='pri' icon='mdi:file-document-plus-outline' onClick={() => onMakeGrn(d)} sx={{ height: 40 }}>Make GRN</Btn>}
             <IconButton aria-label='Close' onClick={onClose} sx={{ p: 0, ml: '4px', color: 'customColors.OnSurfaceVariant' }}><I i='mdi:close' s={24} /></IconButton>
           </Box>
 
@@ -134,9 +138,11 @@ const ChallanSheet = ({ dc, onClose, onAddInvoice, onOpenInvoice }) => {
             </Box>
 
             <Box sx={{ minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {inv && <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', p: '12px 16px', borderRadius: '10px', bgcolor: C.tint }}>
-              <I i='mdi:receipt-text-outline' c={C.greenDark} /><Txt c={C.ink}>On invoice <b>{inv.invoiceNo}</b> · {inv.id}</Txt>{statusPill(inv)}
-            </Box>}
+              {/* the GRN this challan is on, and the invoices billing that GRN (BD-72) */}
+              {grn && <Box sx={{ p: '12px 16px', borderRadius: '10px', bgcolor: C.tint, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}><I i='mdi:file-document-check-outline' c={C.greenDark} /><Txt c={C.ink} sx={{ flex: 1 }}>On <b>{grn.id}</b></Txt>{grnPill(grn)}</Box>
+                {grnInvs.map(i => <Box key={i.id} sx={{ display: 'flex', alignItems: 'center', gap: '10px', pl: '34px' }}><Txt c={C.ink} sx={{ flex: 1 }}>{i.invoiceNo} · {i.id}</Txt>{statusPill(i)}</Box>)}
+              </Box>}
               <Section title='Attachments'>
                 <Row icon='mdi:file-document-outline' label='Filed at receiving' sub={`${(x.receivingFile.sizeKb / 1024).toFixed(1)} MB`}><Link onClick={() => openPaper('recv')}>{x.receivingFile.name}</Link></Row>
                 {x.signedFile

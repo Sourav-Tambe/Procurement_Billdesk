@@ -2,7 +2,7 @@
 // record, and appends one event to its trail (BD-15: { at, by, role, action, from, to, note }; never edited).
 import { commit, getState } from './store'
 import { me } from './roles'
-import { matchOf, takenMap, saveBlocks, checkBlocks, dupOf, normNo } from './logic'
+import { matchOf, saveBlocks, checkBlocks, dupOf, normNo, linesFrom, dcGrnMap, lineTakenMap, grnState, dcsForLines, dcLocked } from './logic'
 import { antzRead, AI_READ_MS } from './antzAi'
 import { sampleRate } from './sample'
 import { kindLabel } from './ui/docStore'
@@ -33,13 +33,82 @@ const rematch = inv => {
 }
 
 // ---------- selectors ----------
-export const takenDcs = s => takenMap(s.invoices)
+// a DC is taken by the GRN that holds it, a GRN line by the invoice that bills it (BD-72)
+export const takenDcs = s => dcGrnMap(s.grns)
+export const takenLines = s => lineTakenMap(s.invoices)
 export const freeDcs = s => {
   const t = takenDcs(s)
 
   return s.dcs.filter(d => !t[d.dcNumber])
 }
 export const invoiceOf = (s, id) => s.invoices.find(i => i.id === id)
+
+// ---------- GRN (BD-72, 5 Nov) ----------
+// Make GRN: the clerk ticks one vendor's challans on Challans › To Group. Lines are the challans' items, each with its
+// received quantity added up across the challans. Its challans can change, or the GRN be deleted, only while no line is
+// on an invoice. Later a GRN can come from another system (source, extRef); invoices bill against it the same way.
+const findGrn = (w, id) => {
+  const g = (w.grns || []).find(x => x.id === id)
+  if (!g) throw new Error('This GRN no longer exists')
+
+  return g
+}
+const grnOpen = (w, g, what) => {
+  if (grnState(g, lineTakenMap(w.invoices)) !== 'to_bill') throw new Error(`Can’t ${what} ${g.id}: it has invoices. Delete them first`)
+}
+// an item received at nothing is not a line to bill
+const grnLines = (base, dcNumbers) => linesFrom(dcNumbers.map(dc => base.dcsBy[dc])).filter(l => l.receivedQty > 0).map(({ itemId, unitId, receivedQty }) => ({ itemId, unitId, receivedQty }))
+export const makeGrn = dcNumbers => commit((w, base) => {
+  if (!dcNumbers.length) throw new Error('Tick the challans to group')
+  const dcs = dcNumbers.map(dc => base.dcsBy[dc])
+  if (dcs.some(d => !d)) throw new Error('A challan is no longer in Diet & Kitchen')
+  if (new Set(dcs.map(d => d.vendorId)).size > 1) throw new Error('A GRN holds one vendor’s challans')
+  w.grns = w.grns || []
+  const held = dcGrnMap(w.grns)
+  const clash = dcNumbers.filter(dc => held[dc])
+  if (clash.length) throw new Error(`${clash.join(', ')} ${clash.length === 1 ? 'is' : 'are'} already on a GRN`)
+  w.seq.grn = (w.seq.grn || 0) + 1
+  const g = { id: `GRN-26-${pad(w.seq.grn, 4)}`, source: 'bill_desk', vendorId: dcs[0].vendorId, dcNumbers: [...dcNumbers].sort(), lines: grnLines(base, dcNumbers), createdAt: now(), createdBy: me().person, trail: [] }
+  g.trail.push(ev('GRN made', null, null, g.dcNumbers.join(', ')))
+  w.grns.push(g)
+
+  return g.id
+})
+// a challan leaves a GRN while none of its items is on an invoice (5 Nov: "ability to remove DC's from one grn"); the
+// last one leaving deletes the GRN
+export const removeFromGrn = (id, dc) => commit((w, base) => {
+  const g = findGrn(w, id)
+  if (!g.dcNumbers.includes(dc)) throw new Error(`${dc} is not on ${g.id}`)
+  if (dcLocked(g, base.dcsBy[dc], lineTakenMap(w.invoices))) throw new Error(`${dc} has items already on an invoice`)
+  if (g.dcNumbers.length === 1) { w.grns = w.grns.filter(x => x.id !== id); return 'deleted' }
+  g.dcNumbers = g.dcNumbers.filter(x => x !== dc)
+  g.lines = grnLines(base, g.dcNumbers)
+  g.trail.push(ev('Challan removed', null, null, dc))
+
+  return 'removed'
+})
+// more of the vendor's challans to group join a GRN, unless one carries an item already billed on it
+export const addToGrn = (id, dcNumbers) => commit((w, base) => {
+  const g = findGrn(w, id)
+  if (!dcNumbers.length) throw new Error('Tick the challans to add')
+  const held = dcGrnMap(w.grns), lt = lineTakenMap(w.invoices)
+  dcNumbers.forEach(dc => {
+    const d = base.dcsBy[dc]
+    if (!d) throw new Error(`${dc} is no longer in Diet & Kitchen`)
+    if (d.vendorId !== g.vendorId) throw new Error('A GRN holds one vendor’s challans')
+    if (held[dc]) throw new Error(`${dc} is already on ${held[dc]}`)
+    if (dcLocked(g, d, lt)) throw new Error(`${dc} has an item already billed on ${g.id}`)
+  })
+  g.dcNumbers = [...g.dcNumbers, ...dcNumbers].sort()
+  g.lines = grnLines(base, g.dcNumbers)
+  g.trail.push(ev(dcNumbers.length === 1 ? 'Challan added' : 'Challans added', null, null, dcNumbers.join(', ')))
+})
+// a GRN goes while no invoice bills it; its challans go back to To Group
+export const deleteGrn = id => commit(w => {
+  const g = findGrn(w, id)
+  grnOpen(w, g, 'delete')
+  w.grns = w.grns.filter(x => x.id !== id)
+})
 
 // ---------- clerk ----------
 // Add invoice / edit (one form, BD-21): vendor → its DCs (free, or freed by deleting the discrepancy invoice holding
@@ -54,7 +123,7 @@ export const sendToAi = f => commit((w, base) => {
   const no = (f.invoiceNo || '').trim()
   if (!no) throw new Error('Enter the invoice number')
   if (!(f.docs || []).length) throw new Error('Attach the invoice')
-  const { paperLines, ...ai } = antzRead(base, w.invoices, { invoiceNo: no, vendorId: f.vendorId }, sampleRate) // eslint-disable-line no-unused-vars
+  const { paperLines, ...ai } = antzRead(base, w.invoices, { invoiceNo: no, vendorId: f.vendorId }, sampleRate, w.grns) // eslint-disable-line no-unused-vars
   // a number already recorded blocks, whichever vendor (2 Nov)
   const dup = w.invoices.find(i => normNo(i.invoiceNo) === normNo(no))
   if (dup) throw new Error(`Invoice ${no} is already recorded as ${dup.id}`)
@@ -69,30 +138,33 @@ export const sendToAi = f => commit((w, base) => {
 export const retryAi = id => commit((w, base) => {
   const inv = find(w, id)
   allow(inv, ['to_connect'], 'resend')
-  const { paperLines, ...ai } = antzRead(base, w.invoices.filter(i => i.id !== id), { invoiceNo: inv.invoiceNo, vendorId: inv.vendorId }, sampleRate) // eslint-disable-line no-unused-vars
+  const { paperLines, ...ai } = antzRead(base, w.invoices.filter(i => i.id !== id), { invoiceNo: inv.invoiceNo, vendorId: inv.vendorId }, sampleRate, w.grns) // eslint-disable-line no-unused-vars
   inv.vendorId = ai.vendorId
   inv.invoiceDate = inv.invoiceDate || ai.invoiceDate
   inv.ai = { ...ai, readyAt: Date.now() + AI_READ_MS, sentAt: now() }
   inv.trail.push(ev('Sent to Antz AI again', null, null, inv.invoiceNo))
 })
+// Add invoice against a GRN (BD-72): the ticked GRN lines are this invoice's; the challans it names are the GRN's
+// challans that carry those items
 export const saveInvoiceForm = f => commit((w, base) => {
-  const dcs = f.dcNumbers.map(dc => base.dcsBy[dc]).filter(Boolean)
-  if (dcs.some(d => d.vendorId !== f.vendorId)) throw new Error('One invoice covers one vendor’s DCs')
+  const g = f.grnId ? findGrn(w, f.grnId) : null
+  if (g && g.vendorId !== f.vendorId) throw new Error('The GRN is another vendor’s')
   let inv = f.id ? find(w, f.id) : null
   if (inv) allow(inv, CLERK_EDIT, 'edit')
-  const draft = { ...(inv || { id: null, approvalIds: [], outcomes: [], trail: [], status: 'draft' }), vendorId: f.vendorId, dcNumbers: f.dcNumbers, invoiceNo: f.invoiceNo.trim(), invoiceDate: f.invoiceDate, lines: f.lines, docs: f.docs || [], printed: f.printed || {} }
-  const blocks = saveBlocks(draft, w.invoices, takenMap(w.invoices))
+  const dcNumbers = g ? dcsForLines(g, f.lines, base.dcsBy) : []
+  const draft = { ...(inv || { id: null, approvalIds: [], outcomes: [], trail: [], status: 'draft' }), vendorId: f.vendorId, grnId: f.grnId || null, dcNumbers, invoiceNo: f.invoiceNo.trim(), invoiceDate: f.invoiceDate, lines: f.lines, docs: f.docs || [], printed: f.printed || {} }
+  const blocks = saveBlocks(draft, w.invoices, lineTakenMap(w.invoices))
   if (blocks.length) throw new Error(blocks[0])
   const before = inv ? inv.docs || [] : []
   if (!inv) {
     w.seq.inv += 1
     inv = { ...draft, id: `BD-26-${pad(w.seq.inv, 4)}` }
     w.invoices.push(inv)
-    inv.trail.push(ev('Invoice added', null, 'draft', `${inv.invoiceNo} · ${inv.dcNumbers.join(', ')}`))
+    inv.trail.push(ev('Invoice added', null, 'draft', `${inv.invoiceNo} · ${inv.grnId}`))
   } else {
     const wasAi = inv.status === 'to_connect'
     Object.assign(inv, draft)
-    if (wasAi) { inv.status = 'draft'; inv.trail.push(ev('DCs connected', 'to_connect', 'draft', inv.dcNumbers.join(', '))) } else inv.trail.push(ev('Invoice edited', null, null, inv.dcNumbers.join(', ')))
+    if (wasAi) { inv.status = 'draft'; inv.trail.push(ev('GRN connected', 'to_connect', 'draft', inv.grnId)) } else inv.trail.push(ev('Invoice edited', null, null, inv.grnId))
   }
   const added = inv.docs.filter(d => !before.some(b => b.id === d.id)), removed = before.filter(b => !inv.docs.some(d => d.id === b.id))
   if (added.length) inv.trail.push(ev(`Attached ${added.length === 1 ? 'a document' : `${added.length} documents`}`, null, null, added.map(d => `${kindLabel(d.kind)}: ${d.name}`).join(', ')))
@@ -104,7 +176,7 @@ export const saveInvoiceForm = f => commit((w, base) => {
   return inv.id
 })
 
-// delete an invoice still with the clerk; its DCs are free to bill again (BD-9). Used when a corrected invoice
+// delete an invoice still with the clerk; its GRN lines are free to bill again (BD-72). Used when a corrected invoice
 // replaces one with discrepancies (BD-22).
 export const deleteInvoice = id => commit(w => {
   const inv = find(w, id)

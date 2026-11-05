@@ -3,7 +3,7 @@
 // data, the flow actions and the screens.
 
 export const STATUS = {
-  to_connect: 'Pending Match',
+  to_connect: 'Draft',
   draft: 'With clerk',
   with_head: 'With head',
   returned_to_clerk: 'Returned to clerk',
@@ -18,8 +18,8 @@ export const STATUS = {
 // an invoice's stage as every pill shows it, in the tables, Payments, the details header, the stage rail and Data
 // Explorer (Sourav, 3 Nov: "match all the status pills, from the table and the details page"): status → [label, tone]
 export const STAGE = {
-  to_connect: ['Pending Match', 'quiet'],
-  draft: ['Pending Match', 'quiet'],
+  to_connect: ['Draft', 'quiet'],
+  draft: ['Draft', 'quiet'],
   returned_to_clerk: ['Correction Needed', 'warn'],
   with_head: ['Under Review', 'quiet'],
   returned_by_finance: ['Returned by Finance', 'warn'],
@@ -64,6 +64,35 @@ export const takenMap = invoices => {
 
   return m
 }
+
+// BD-72 (5 Nov): n challans → 1 GRN → 1 or n invoices. The clerk groups one vendor's challans into a GRN; a GRN line is
+// one item, its received quantity added up across the GRN's challans; each line goes on exactly one invoice. A DC is
+// taken while a GRN holds it; a GRN line while an invoice holds it (deleting the invoice frees the line).
+export const dcGrnMap = grns => {
+  const m = {}
+  ;(grns || []).forEach(g => g.dcNumbers.forEach(dc => { m[dc] = g.id }))
+
+  return m
+}
+export const lineKey = (grnId, itemId) => `${grnId}:${itemId}`
+export const lineTakenMap = invoices => {
+  const m = {}
+  invoices.forEach(i => { if (i.grnId) i.lines.forEach(l => { if (l.itemId && !l.extra) m[lineKey(i.grnId, l.itemId)] = i.id }) })
+
+  return m
+}
+// To Bill (no line on an invoice) · Partly Billed · Fully Billed, worked out from the invoices, never stored
+export const GRN_STATE = { to_bill: ['To Bill', 'quiet'], partly: ['Partly Billed', 'check'], fully: ['Fully Billed', 'ok'] }
+export const grnBilled = (g, taken) => g.lines.filter(l => taken[lineKey(g.id, l.itemId)]).length
+export const grnState = (g, taken) => { const n = grnBilled(g, taken); return n === 0 ? 'to_bill' : n < g.lines.length ? 'partly' : 'fully' }
+// a challan whose items are already billed on this GRN can't leave it, and a challan whose items are can't join it:
+// either would change the received quantity of a line on an invoice
+export const billedItems = (g, taken) => new Set(g.lines.filter(l => taken[lineKey(g.id, l.itemId)]).map(l => l.itemId))
+export const dcLocked = (g, d, taken) => { const b = billedItems(g, taken); return !!d && d.lines.some(l => l.receivedQty > 0 && b.has(l.itemId)) }
+export const grnInvoiceIds = (g, taken) => [...new Set(g.lines.map(l => taken[lineKey(g.id, l.itemId)]).filter(Boolean))]
+// the challans an invoice's lines came from (Invoice details, the signed-DC check, the Excel): the GRN's challans that
+// carry one of its items
+export const dcsForLines = (g, lines, dcsBy) => g.dcNumbers.filter(dc => (dcsBy[dc]?.lines || []).some(l => lines.some(x => x.itemId === l.itemId)))
 
 // lines start from what was received: one line per item across the chosen DCs, billed = received until the clerk
 // enters what the bill says (BD-2)
@@ -118,15 +147,17 @@ export const docsSummary = docs => { const n = (docs || []).length; return n ? `
 export const saveBlocks = (inv, invoices, taken) => {
   const b = []
   if (!inv.vendorId) b.push('Pick the vendor')
-  if (!inv.dcNumbers.length) b.push('Pick at least one DC')
+  if (!inv.grnId) b.push('Pick the GRN')
+  else if (!inv.lines.length) b.push('Tick at least one item')
   if (!inv.invoiceNo?.trim()) b.push('Enter the invoice number')
   if (!inv.invoiceDate) b.push('Enter the invoice date')
-  if (inv.lines.some(l => !l.itemId)) b.push('Pick the DC item for every line')
+  if (inv.lines.some(l => !l.itemId)) b.push('Pick the GRN item for every line')
   // rate and GST are optional (Sourav, 2 Nov: "don't make rate, gst mandatory"); a line without a rate adds nothing to the total
   if (!(inv.docs || []).length) b.push('Attach the invoice')
   if (dupOf(inv, invoices)) b.push(`Invoice ${inv.invoiceNo} is already recorded`)
-  const clash = inv.dcNumbers.filter(dc => taken[dc] && taken[dc] !== inv.id)
-  if (clash.length) b.push(`${clash.join(', ')} ${clash.length === 1 ? 'is' : 'are'} on another invoice`)
+  // taken: lineTakenMap; a GRN line is on one invoice only
+  const clash = inv.grnId ? inv.lines.filter(l => l.itemId && !l.extra && taken[lineKey(inv.grnId, l.itemId)] && taken[lineKey(inv.grnId, l.itemId)] !== inv.id) : []
+  if (clash.length) b.push(`${clash.length === 1 ? 'An item' : `${clash.length} items`} on this invoice ${clash.length === 1 ? 'is' : 'are'} already on another invoice`)
 
   return b
 }

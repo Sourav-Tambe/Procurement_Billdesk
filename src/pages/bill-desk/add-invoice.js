@@ -1,5 +1,5 @@
-// /bill-desk/add-invoice: the Add invoice form as a full page (Sourav, 31 Oct). ?vendor=<id>&dc=<DC number> starts it
-// with that DC ticked (from the challan sheet); ?edit=<BD no.> edits an invoice still with the clerk. Read after mount.
+// /bill-desk/add-invoice: the Add invoice form as a full page (Sourav, 31 Oct). ?grn=<GRN no.> starts it on that GRN
+// (from the GRN sheet, BD-72); ?edit=<BD no.> edits an invoice still with the clerk. Read after mount.
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { getRole, setRole } from 'src/billdesk/roles'
@@ -15,16 +15,16 @@ const AddInvoicePage = () => {
   const q = new URLSearchParams(window.location.search)
   const invoice = q.get('edit') ? getState().invoices.find(i => i.id === q.get('edit')) : undefined
   // Back goes to where the invoice lives, not to browser history (which may hold another site or a stale entry):
-  // an invoice being edited returns to its Invoices tab, a new one to the challan it started from or to the list
+  // an invoice being edited returns to its Invoices tab, a new one to the GRN it started from or to the GRNs list
   const back = () => {
     if (invoice) return router.push(listOf(invoice))
-    if (q.get('dc')) return router.push(`/bill-desk/dc/${q.get('dc')}`)
+    if (q.get('grn')) return router.push(`/bill-desk/grn/${q.get('grn')}`)
 
-    return router.push('/bill-desk/challans/to-bill')
+    return router.push('/bill-desk/grns/to-bill')
   }
 
   return (
-    <InvoiceForm key={window.location.search} invoice={invoice} vendorId={q.get('vendor') || undefined} dcNumber={q.get('dc') || undefined} onClose={back}
+    <InvoiceForm key={window.location.search} invoice={invoice} grnId={q.get('grn') || undefined} onClose={back}
       onSent={() => router.push('/bill-desk/invoices/pending-match')}
       onSaved={() => router.push('/bill-desk/invoices/under-review')} />
   )

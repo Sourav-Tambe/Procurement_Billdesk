@@ -7,14 +7,14 @@ import { useState } from 'react'
 import { Box, Button, Card, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import CommonDialogBox from 'src/components/CommonDialogBox'
-import { useBillDesk, vendorOf, itemOf, unitOf } from '../store'
-import { computedOf, fmtDay, fmtAt, inr, r2 } from '../logic'
+import { useBillDesk, vendorOf, itemOf, unitOf, whOf, grnOf } from '../store'
+import { computedOf, fmtDay, fmtAt, inr, r2, lineTakenMap, grnBilled, grnInvoiceIds } from '../logic'
 import { C, T, I, Btn, Txt } from '../ui/ui'
 import { Page, Pill, StagePill, Grid } from '../ui/parts'
-import ChallanCard from '../ui/ChallanCard'
 import ItemThumb from '../ui/ItemThumb'
 import DocViewRow from '../ui/DocViewRow'
 import InvoicePipeline from '../ui/InvoicePipeline'
+import { GrnSheet } from './GrnDesk'
 import { DocViewer } from '../ui/DocTiles'
 import PdfFileCard from '../ui/PdfFileCard'
 import { ActivityRail, ActivitySheet } from '../ui/ActivityRail'
@@ -42,6 +42,7 @@ const InvoiceSheet = ({ id, onClose, onEdit, onDelete, onPeekDc, page = false, a
   const [menu, setMenu] = useState(null)
   const [view, setView] = useState(null)
   const [all, setAll] = useState(false) // the Activity side sheet
+  const [grnOpen, setGrnOpen] = useState(false) // the GRN side sheet (5 Nov: "GRN there on click should open sidesheet")
   const inv = s.invoices.find(i => i.id === id)
   if (!inv) return null
   const c = computedOf(inv)
@@ -72,10 +73,15 @@ const InvoiceSheet = ({ id, onClose, onEdit, onDelete, onPeekDc, page = false, a
           ]} />
         </Box>
   )
+  // the challans as a table, the same as the form's (Sourav, 5 Nov: "make it also table"); a row opens the goods receipt
   const challanGrid = (
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: '12px' }}>
-          {inv.dcNumbers.map(dc => s.dcsBy[dc] && <ChallanCard key={dc} s={s} d={s.dcsBy[dc]} onView={() => onPeekDc(dc)} />)}
-        </Box>
+        // compact to fit the details column: no serial, received as date and name on two lines
+        <Grid paginate={false} serial={false} rows={inv.dcNumbers.map(dc => s.dcsBy[dc]).filter(Boolean)} rowKey={d => d.dcNumber} onRow={d => onPeekDc(d.dcNumber)} empty='None added yet' cols={[
+          { nowrap: true, width: 150, key: 'dc', label: 'Challan no.', render: d => <Txt t='bodyTitle' c={C.black}>{d.dcNumber}</Txt> },
+          { key: 'items', label: 'Items', flex: 1, minWidth: 160, render: d => { const n = d.lines.map(l => itemOf(s, l.itemId)?.name).filter(Boolean); return <Txt c={C.ink} sx={{ whiteSpace: 'normal' }}>{n.slice(0, 2).join(', ')}{n.length > 2 && <Txt t='bodyTitle' c={C.quiet}>{` +${n.length - 2}`}</Txt>}</Txt> } },
+          { nowrap: true, width: 140, key: 'wh', label: 'Warehouse', render: d => whOf(s, d.warehouseId) },
+          { nowrap: true, width: 140, key: 'at', label: 'Received', render: d => <Box><Txt c={C.ink} sx={{ display: 'block' }}>{fmtDay(d.receivedAt)}</Txt><Txt t='sub' c={C.quiet}>{d.receivedBy}</Txt></Box> }
+        ]} />
   )
   const body = modal => (
     <Box sx={{ ...(modal && { flex: 1, minHeight: 0, overflowY: 'auto', bgcolor: 'customColors.Background', p: '16px 24px 24px' }), display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -112,9 +118,7 @@ const InvoiceSheet = ({ id, onClose, onEdit, onDelete, onPeekDc, page = false, a
 
       {/* challans and documents three across, as on the form (Sourav, 2 Nov) */}
       <Box2 title='Challans' count={inv.dcNumbers.length}>
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: '12px' }}>
-          {inv.dcNumbers.map(dc => s.dcsBy[dc] && <ChallanCard key={dc} s={s} d={s.dcsBy[dc]} onView={() => onPeekDc(dc)} />)}
-        </Box>
+        {challanGrid}
       </Box2>
 
       <Box2 title='Documents' count={(inv.docs || []).length}>
@@ -150,6 +154,7 @@ const InvoiceSheet = ({ id, onClose, onEdit, onDelete, onPeekDc, page = false, a
       <Typography sx={{ fontSize: 15, fontWeight: 500, textAlign: 'right', color: tone || 'customColors.OnSurfaceVariant' }}>{value}</Typography>
     </Box>
   )
+  const grn = grnOf(s, inv.grnId), grnLt = lineTakenMap(s.invoices)
   const sectionTitle = (t, n) => <Typography sx={{ fontSize: 15, fontWeight: 600, color: 'customColors.OnSurfaceVariant', mb: 3 }}>{t} <Box component='span' sx={{ fontWeight: 400, color: 'customColors.neutralSecondary' }}>({n})</Box></Typography>
   const cardTitle = (t, n, right) => (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 3, mb: 4.5 }}>
@@ -215,12 +220,21 @@ const InvoiceSheet = ({ id, onClose, onEdit, onDelete, onPeekDc, page = false, a
           </Box>
 
           {/* challans: a compact card each, above the items (Sourav, 2 Nov: "challans i need a proper small section above the items") */}
+          {/* the GRN this invoice bills, and how far that GRN is billed (BD-72) */}
+          {grn && <Box role='button' tabIndex={0} onClick={() => setGrnOpen(true)} onKeyDown={e => { if (e.key === 'Enter') setGrnOpen(true) }}
+            sx={{ mt: 5, display: 'flex', alignItems: 'center', gap: '12px', p: '12px 16px', borderRadius: '10px', bgcolor: C.tint, cursor: 'pointer', '&:hover': { filter: 'brightness(0.97)' } }}>
+            <I i='mdi:file-document-check-outline' c={C.greenDark} />
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Txt t='bodyTitle' c={C.greenDark}>{grn.id}</Txt>
+              <Txt c={C.text} sx={{ display: 'block' }}>This GRN: {grnInvoiceIds(grn, grnLt).length} {grnInvoiceIds(grn, grnLt).length === 1 ? 'invoice' : 'invoices'} · {grnBilled(grn, grnLt)} of {grn.lines.length} lines billed</Txt>
+            </Box>
+            <I i='mdi:chevron-right' c={C.greenDark} />
+          </Box>}
+          {grn && grnOpen && <GrnSheet id={grn.id} onClose={() => setGrnOpen(false)} />}
           <Box sx={{ mt: 5 }}>
             {sectionTitle('Challans', inv.dcNumbers.length)}
             {inv.dcNumbers.length
-              ? <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 3 }}>
-                  {inv.dcNumbers.map(dc => s.dcsBy[dc] && <ChallanCard key={dc} s={s} d={s.dcsBy[dc]} onView={() => onPeekDc(dc)} />)}
-                </Box>
+              ? challanGrid
               : <Typography variant='body2' sx={{ color: 'customColors.neutralSecondary' }}>None added yet</Typography>}
           </Box>
 

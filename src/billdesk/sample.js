@@ -1,7 +1,7 @@
 // Sample work for the prototype (BD-16): eleven invoices over Naveen's real DCs, one or more in every state, with
 // their handovers, approval batches and trails, so each role's tabs have rows on first open. Rates are sample rates
 // by item type (DCs carry none); each bill scan is an SVG drawn from the invoice itself.
-import { linesFrom, matchOf, computedOf, r2 } from './logic'
+import { linesFrom, matchOf, computedOf, r2, dcsForLines } from './logic'
 import { antzRead } from './antzAi'
 
 const CLERK = 'Mark Ellis', HEAD = 'Daniel Brooks', FIN = 'Rachel Morgan'
@@ -30,6 +30,13 @@ const SPECS = [
   { dcs: ['MGT-3707', 'MGT-3713'], no: 'MGT/26/571', date: '2026-10-13', end: 'draft', bill: { 'pi-GRC-0041': 160, 'pi-GRC-0046': 70 } },
   { dcs: ['DFL/26/2560', 'DFL/26/2568'], no: 'DFL/INV/26/0917', date: '2026-10-14', end: 'draft', bill: { 'pi-FED-0018': 20 } },
   { dcs: ['HFT/425'], no: 'HFT-1040', date: '2026-10-14', end: 'draft', bill: { 'pi-FED-0011': 18 } },
+  // --- BD-72 (5 Nov): GRNs billed by more than one invoice. grn: the GRN's challans; items: the GRN lines this invoice
+  //     bills. Sri Lakshmi's GRN is partly billed (3 of 5), Annapurna's too (3 of 5, apples billed over); Kaveri's GRN is
+  //     fully billed by two invoices ---
+  { grn: ['SLA/2610/3797', 'SLA/2610/3805', 'SLA/2610/3809'], items: ['pi-FV-0201', 'pi-FV-0207', 'pi-FV-0112'], no: 'SLA/INV/3797', date: '2026-10-13', end: 'with_head' },
+  { grn: ['AFM-3406', 'AFM-3410'], items: ['pi-FV-0121', 'pi-FV-0118', 'pi-FV-0105'], no: 'AFM-26-0440', date: '2026-10-14', end: 'draft', bill: { 'pi-FV-0105': 65 } },
+  { grn: ['KMS-2283', 'KMS-2284', 'KMS-2286'], items: ['pi-NV-0031', 'pi-NV-0035'], no: 'KMS/INV/1201', date: '2026-10-15', end: 'checked' },
+  { grn: ['KMS-2283', 'KMS-2284', 'KMS-2286'], items: ['pi-NV-0032', 'pi-NV-0033'], no: 'KMS/INV/1202', date: '2026-10-16', end: 'with_head' },
   // --- with the head ---
   { dcs: ['AFM-3393', 'AFM-3401'], no: 'AFM-26-0433', date: '2026-10-11', end: 'with_head' },
   { dcs: ['ND-1002', 'ND-1005'], no: 'ND/2026/1099', date: '2026-10-10', end: 'with_head' },
@@ -50,6 +57,8 @@ const SPECS = [
   { dcs: ['MPF/2727'], no: 'MPF-B-2727', date: '2026-10-13', end: 'rejected', ho: 1, pa: 1, reason: 'Vendor bank details not verified' },
   { dcs: ['SLA/2610/3779'], no: 'SLA/INV/3779', date: '2026-10-05', end: 'deferred', ho: 1, pa: 1, reason: 'Hold till the November budget release' }
 ]
+// GRNs the clerk has made and not billed yet (GRNs › To Bill); the Antz AI samples read against these
+const TO_BILL = [[['GVF-3287', 'GVF-3294'], '2026-10-16T10:05'], [['MGT-3720'], '2026-10-16T10:20'], [['KMS-2281', 'KMS-2287'], '2026-10-16T10:40']]
 const HANDOVERS = {
   1: { at: '2026-10-17T11:20', note: 'First batch of October', receivedAt: '2026-10-17T15:05' },
   2: { at: '2026-10-21T10:40', note: '', receivedAt: '2026-10-21T16:30' },
@@ -102,16 +111,32 @@ export const challanSvg = (dc, base) => {
 
 export const sampleWork = base => {
   const invoices = [], handovers = {}, approvals = {}
+  // every sample invoice bills a GRN (BD-72): one GRN per challan set, made the morning of its first invoice
+  const grns = [], grnBy = {}
+  const grnFor = (dcList, at) => {
+    const k = dcList.join('|')
+    if (grnBy[k]) return grnBy[k]
+    const dcNumbers = [...dcList].sort()
+    const g = { id: `GRN-26-${pad(grns.length + 1, 4)}`, sample: true, source: 'bill_desk', vendorId: base.dcsBy[dcList[0]].vendorId, dcNumbers,
+      lines: linesFrom(dcList.map(dc => base.dcsBy[dc])).filter(l => l.receivedQty > 0).map(({ itemId, unitId, receivedQty }) => ({ itemId, unitId, receivedQty })), createdAt: at, createdBy: CLERK,
+      trail: [ev(at, CLERK, 'clerk', 'GRN made', null, null, dcNumbers.join(', '))] }
+    grns.push(g)
+    grnBy[k] = g
+
+    return g
+  }
   SPECS.forEach((s, i) => {
     const id = `BD-26-${pad(i + 1, 4)}`
-    const dcs = s.dcs.map(dc => base.dcsBy[dc])
-    const lines = linesFrom(dcs).map(l => {
+    const g = grnFor(s.grn || s.dcs, `${s.date}T08:30`)
+    const lines = g.lines.filter(l => !s.items || s.items.includes(l.itemId)).map(l => {
       const [rate, gstPct] = rateOf(base.items.find(x => x.id === l.itemId), l.unitId)
 
-      return { ...l, billedQty: s.bill?.[l.itemId] ?? l.billedQty, rate, gstPct }
+      return { ...l, billedQty: s.bill?.[l.itemId] ?? l.receivedQty, rate, gstPct }
     })
     ;(s.extra || []).forEach(x => { const [rate, gstPct] = rateOf(base.items.find(i => i.id === x.itemId), x.unitId); lines.push({ ...x, receivedQty: 0, extra: true, rate, gstPct }) })
-    const inv = { id, sample: true, vendorId: dcs[0].vendorId, dcNumbers: s.dcs, invoiceNo: s.no, invoiceDate: s.date, lines, approvalIds: [], outcomes: [], trail: [] }
+    const dcNumbers = dcsForLines(g, lines, base.dcsBy)
+    const dcs = dcNumbers.map(dc => base.dcsBy[dc])
+    const inv = { id, sample: true, vendorId: g.vendorId, grnId: g.id, dcNumbers, invoiceNo: s.no, invoiceDate: s.date, lines, approvalIds: [], outcomes: [], trail: [] }
     inv.printed = (({ taxable, gst, total }) => ({ taxable, gst, total }))(computedOf(inv))
     Object.entries(s.printedOff || {}).forEach(([k, off]) => { inv.printed[k] = r2(inv.printed[k] + off) })
     // the set that came with the invoice: the bill and a copy of each challan
@@ -128,7 +153,7 @@ export const sampleWork = base => {
     // the trail, step by step, up to where this sample stops
     let at = plus(`${s.date}T09:00`, 30), st = 'draft'
     const step = (by, role, action, to, note, h = 20) => { at = plus(at, h); inv.trail.push(ev(at, by, role, action, st, to, note)); st = to }
-    inv.trail.push(ev(at, CLERK, 'clerk', 'Invoice added', null, 'draft', `${s.no} · ${s.dcs.join(', ')}`))
+    inv.trail.push(ev(at, CLERK, 'clerk', 'Invoice added', null, 'draft', `${s.no} · ${g.id}`))
     inv.trail.push(ev(at, CLERK, 'clerk', `Attached ${inv.docs.length} documents`, null, null, inv.docs.map(d => d.name).join(', ')))
     // saved is sent (2 Nov): a sample that stopped at "draft" is now with the head
     step(CLERK, 'clerk', 'Sent to the head', 'with_head', null, 2)
@@ -163,11 +188,13 @@ export const sampleWork = base => {
     invoices.push(inv)
   })
 
+  TO_BILL.forEach(([dcList, at]) => grnFor(dcList, at))
+
   // two invoices sent to Antz AI (1 Nov): one read and waiting in To connect, one still being read for a short while
   let seq = SPECS.length
   // one row in each parsing status (2 Nov): Needs check, two Read, Reading; Failed is added below
   ;[['GVF/2610/061', 0], ['AFM/INV/0412', 0, true, '2026-11-01T09:40'], ['MGT/2611/118', 0, true, '2026-11-02T08:15'], ['KMS/INV/1190', 25000]].forEach(([no, wait, clean, at]) => {
-    const ai = antzRead(base, invoices, { invoiceNo: no, clean }, rateOf)
+    const ai = antzRead(base, invoices, { invoiceNo: no, clean }, rateOf, grns)
     seq += 1
     const id = `BD-26-${pad(seq, 4)}`
     const paper = { vendorId: ai.vendorId, invoiceNo: no, invoiceDate: ai.invoiceDate, dcNumbers: ai.dcHints, lines: ai.paperLines }
@@ -185,5 +212,5 @@ export const sampleWork = base => {
     ai: { failed: true, error: 'The photo is too dark to read', lines: [], dcHints: [], readyAt: 0, sentAt: '2026-10-31T11:14' },
     trail: [ev('2026-10-31T11:14', CLERK, 'clerk', 'Sent to Antz AI', null, 'to_connect', fno), ev('2026-10-31T11:15', 'Antz AI', 'clerk', 'Antz AI couldn’t read this invoice', null, null, 'The photo is too dark to read')] })
 
-  return { v: 9, invoices, handovers: Object.values(handovers), approvals: Object.values(approvals), seq: { inv: seq, ho: 3, pa: 2 } }
+  return { v: 10, grns, invoices, handovers: Object.values(handovers), approvals: Object.values(approvals), seq: { inv: seq, ho: 3, pa: 2, grn: grns.length } }
 }

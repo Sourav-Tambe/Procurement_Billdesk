@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from 'react'
 
 export const ROLES = [
-  { value: 'clerk', label: 'Accounts clerk', person: 'Mark Ellis', initials: 'ME', home: '/bill-desk/challans/to-bill' },
+  { value: 'clerk', label: 'Accounts clerk', person: 'Mark Ellis', initials: 'ME', home: '/bill-desk/challans/to-group' },
   { value: 'head', label: 'Bill Desk head', person: 'Daniel Brooks', initials: 'DB', home: '/bill-desk/invoices/submitted' },
   { value: 'finance', label: 'Finance', person: 'Rachel Morgan', initials: 'RM', home: '/bill-desk/finance/to-verify' }
 ]
